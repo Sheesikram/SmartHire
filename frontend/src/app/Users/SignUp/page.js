@@ -8,8 +8,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
+import { useDispatch, useSelector } from "react-redux";
+import { show_search } from "@/Redux/Action";
 const OtpInput = ({ otp, setOtp }) => {
+
     const inputRefs = useRef([]);
 
     const handleChange = (e, index) => {
@@ -71,7 +73,8 @@ const Signup = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const fileInputRef = useRef(null);
     const router = useRouter();
-
+    const dispatch = useDispatch();
+    dispatch(show_search(false));
     useEffect(() => {
         let countdown;
         if (isOtpSent && timer > 0) {

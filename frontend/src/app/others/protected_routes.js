@@ -35,7 +35,7 @@ const Protect = ({ children }) => {
 
     if (role === "admin") {
         console.log("admin role")
-        if ( router === "/admin" || router === "/admin/addadmin" || router === "/admin/addproduct" ||  router === "/error" || router === "/admin/deladmin" || router === "/admin/delprod" || router === "/admin/updateprod" || router === "/admin/dashboard" || router === "/admin/profile") {
+        if ( router === "/Admin/deleteusers" || router === "/Admin/deletesubscription" || router === "/Admin/dashboard"||  router === "/error" ) {
             return <>{children}</>;
         } else {
             route.push("/error");
@@ -62,7 +62,7 @@ const Protect = ({ children }) => {
         if (
             router=="/Users/Home"   || router=="/Users/Posts"  ||
             router=="/Users/Notifications"  || router=="/Users/Profile"  ||
-            router==="/error"
+            router==="/error" || router=="/Users/Posts/CreateJob " || router.startsWith("/Users/Posts/")
         ) {
             return <>{children}</>;
         } else {
@@ -77,13 +77,12 @@ const Protect = ({ children }) => {
         if (
             router=="/Users/Home" ||
             router=="/Users/SignIn" ||
-            router=="/Users/SignUp" ||
-            router=="/home"
+            router=="/Users/SignUp" 
 
         ) {
             return <>{children}</>;
         } else {
-            route.push("/home");
+            route.push("/Users/Home");
             return null;
         }
     } 

@@ -10,8 +10,9 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Role_Action } from "@/Redux/Action";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-
+import { show_search } from "@/Redux/Action";
 const SignIn = () => {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -27,6 +28,8 @@ const SignIn = () => {
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(0);
     const dispatch = useDispatch();
+    dispatch(show_search(false));
+
     const userRole = useSelector((state) => state.Role_Reducer);
     const router = useRouter();
 
@@ -64,9 +67,19 @@ const SignIn = () => {
 
         try {
             const response = await axios.post('http://127.0.0.1:3001/login/', { email, password }, { withCredentials: true });
-            await dispatch(Role_Action("Candidate"));
+            const userRole = response.data.user.role; // Get the user's role
+            console.log(userRole);
+            if (userRole === "user") {
+                await dispatch(Role_Action("Candidate"));
+                router.push("/Users/Home");
+            } else if (userRole === "admin") {
+                await dispatch(Role_Action("admin"));
+                router.push("/Admin/dashboard");
+            } else {
+                console.error("Unknown role:", userRole);
+            }
             resetForm();
-            router.push("/Users/Home");
+            
         } catch (error) {
             setPasswordError("Invalid email or password.");
         }
@@ -252,7 +265,7 @@ const SignIn = () => {
                                     {otpError && <p className="text-red-500 text-sm mt-1 text-center">{otpError}</p>}
                                     <button
                                         type="submit"
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105 active:scale-95"
+                                        className="w-full  bg-[#0073b1] text-white font-bold py-3 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105 active:scale-95"
                                     >
                                         Verify OTP
                                     </button>
@@ -260,7 +273,7 @@ const SignIn = () => {
                                         <button
                                             type="button"
                                             onClick={handleResendOtp}
-                                            className="w-full bg-gray-200 text-blue-600 py-3 mt-2 rounded-lg focus:outline-none shadow-lg"
+                                            className="w-full  bg-gray-200 text-blue-600 py-3 mt-2 rounded-lg focus:outline-none shadow-lg"
                                         >
                                             Resend OTP
                                         </button>
@@ -286,7 +299,7 @@ const SignIn = () => {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105 active:scale-95"
+                                        className="w-full bg-[#0073b1] text-white font-bold py-3 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105 active:scale-95"
                                     >
                                         {loading ? "Processing..." : "Send OTP"}
                                     </button>

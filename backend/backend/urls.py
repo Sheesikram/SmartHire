@@ -23,6 +23,13 @@ from signin.views import sign_in,send_otp_signin,verify_otp_signin,reset_passwor
 from getUserData.views import get_user_data,get_user_role
 from signout.views import logout_view
 from profil.views import update_profile,get_profile
+from JobList.views import get_jobs_for_recruiter,get_all_jobs
+from createjob.views import get_recruiter_company,create_job
+from AI_job_title.views import enhance_job_title
+from Check_Ai_subs.views import has_ai_subscription,has_prac_subscription
+from checkout.views import create_checkout_session,verify_payment
+from Up_del_ret_job.views import get_job_by_id,update_job,delete_job
+from Dashboard.views import get_dashboard_stats
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,5 +47,18 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('profile/', get_profile, name='get_profile'),
     path('update_profile/', update_profile, name='update_profile'),
+    path('getjobs/',get_jobs_for_recruiter, name='getjobs'),
+    path('get_recruiter_company/',get_recruiter_company, name='get_recruiter_company'),
+    path('createjob/',create_job, name='create_job'),
+    path('generate-job-title/',enhance_job_title, name='generate-job-title'),
+    path('has-ai-subscription/', has_ai_subscription, name='has_ai_subscription'),
+    path('has-prac-subscription/', has_prac_subscription, name='has_prac_subscription'),
+    path('create_checkout_session/', create_checkout_session, name='create_checkout_session'),
+    path('verify_payment/', verify_payment, name='verify_payment'),
+    path('get_job/<int:job_id>/', get_job_by_id, name='get_job_by_id'),
+    path('updatejob/<int:job_id>/', update_job, name='update_job'),
+    path('deletejob/<int:job_id>/', delete_job, name='delete_job'),
+    path('get_all_job', get_all_jobs, name='get_all_job'),
+    path('dashboard/', get_dashboard_stats, name='dashboard'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

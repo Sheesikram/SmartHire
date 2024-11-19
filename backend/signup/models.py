@@ -27,7 +27,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    is_subscription = models.BooleanField(default=False)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -71,7 +70,7 @@ class Profile(models.Model):
 
 class Candidate(models.Model):
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True)
-    score = models.FloatField()
+    score = models.FloatField(default=0)
     education = models.TextField(blank=True, null=True)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     skills = models.TextField(blank=True, null=True)
@@ -103,3 +102,59 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"Subscription for {self.user.email}"
+
+
+
+class Job(models.Model):
+    WORKPLACE_TYPE_CHOICES = [
+    ('Remote', 'Remote'),
+    ('On site', 'On site'),
+    ('Hybrid', 'Hybrid'),
+]
+
+    EMPLOYMENT_TYPE_CHOICES = [
+    ('Full-time', 'Full-time'),
+    ('Part-time', 'Part-time'),
+    ('Contract', 'Contract'),
+    ('Temporary','Temporary'),
+    ('Internship','Internship')
+]
+
+    # In your models.py file
+    SKILLS_CHOICES = [
+    ('Front-end', 'Front-end'),
+    ('Back-end', 'Back-end'),
+    ('Full Stack', 'Full Stack'),
+    ('App Development', 'App Development'),
+    ('DB Administrator', 'DB Administrator')
+]
+
+
+
+    INTERVIEW_TYPE_CHOICES = [
+        ('ai', 'AI'),
+        ('manual', 'Manual'),
+    ]
+
+    job_name = models.CharField(max_length=255)
+    workplace_type = models.CharField(max_length=10, choices=WORKPLACE_TYPE_CHOICES)
+    job_location = models.CharField(max_length=255)
+    employment_type = models.CharField(max_length=10, choices=EMPLOYMENT_TYPE_CHOICES)
+    description = models.TextField()
+    skills = models.CharField(max_length=20, choices=SKILLS_CHOICES)  # Corrected choices field
+    interview_type = models.CharField(max_length=10, choices=INTERVIEW_TYPE_CHOICES)
+
+    recruiter = models.ForeignKey('Recruiter', on_delete=models.CASCADE, related_name='jobs')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.job_name} at {self.company_name}"
+
+class Profit(models.Model):
+    id = models.AutoField(primary_key=True)
+    net_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"Profit ID: {self.id}, Net Profit: {self.net_profit}"

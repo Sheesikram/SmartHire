@@ -9,7 +9,7 @@ const ErrorPage = () => {
 
     const handleGoHome = () => {
         if (role === 'admin') {
-            router.push('/Admin/Home'); 
+            router.push('/Admin/dashboard'); 
         } else {
             router.push('/Users/Home');
         }

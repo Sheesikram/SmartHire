@@ -15,6 +15,7 @@ module.exports = {
         // Add or modify your breakpoints if necessary
         tablet: '768px',
       },
+      
     },
   },
   plugins: [],

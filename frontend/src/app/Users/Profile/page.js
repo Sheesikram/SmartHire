@@ -3,8 +3,11 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Image from "next/image";
-
+import { useDispatch } from "react-redux";
+import { show_search } from "@/Redux/Action";
 const Profile = () => {
+  const dispatch = useDispatch();
+  dispatch(show_search(false));
   const role = useSelector((state) => state.Role_Reducer);
 
   const [formData, setFormData] = useState({

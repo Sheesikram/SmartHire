@@ -50,9 +50,10 @@ def get_user_data(request):
 @authentication_classes([CustomJWTAuthentication])
 @permission_classes([IsAuthenticated])
 def get_user_role(request):
+    print("hello it is running")
     user_role_param = request.query_params.get('role')
     user = request.user  
-    
+    print(user.role,user_role_param)
     if not user_role_param or not user:
         return Response(
             {'error': 'User role or user ID not provided.'},
@@ -63,14 +64,19 @@ def get_user_role(request):
         if user.role == 'user':
             if user_role_param == 'Guest':
                 return Response({'role': 'Candidate'}, status=status.HTTP_200_OK)
-            elif user_role_param == 'Admin':
-                return Response({'role': 'Admin'}, status=status.HTTP_200_OK)
+            elif user_role_param == 'admin':
+                return Response({'role': 'admin'}, status=status.HTTP_200_OK)
             elif user_role_param == 'Candidate':
                 return Response({'role': 'Candidate'}, status=status.HTTP_200_OK)
             elif user_role_param == 'Recruiter':
                 return Response({'role': 'Recruiter'}, status=status.HTTP_200_OK)
             else:
                 return Response({'role': 'Guest'}, status=status.HTTP_400_BAD_REQUEST)
+        if user.role == 'admin':
+            if user_role_param == 'Guest':
+                return Response({'role': 'admin'}, status=status.HTTP_200_OK)
+            if user_role_param == 'admin':
+                return Response({'role': 'admin'}, status=status.HTTP_200_OK)
         else:
             return Response({'role': 'Guest'}, status=status.HTTP_200_OK) 
 

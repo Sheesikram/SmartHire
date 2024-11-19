@@ -25,7 +25,7 @@ def get_profile(request):
             user_data = {
                 'email': user.email,
                 'role': user.role,
-                'is_subscription': user.is_subscription
+                
             }
 
             # Retrieve profile data

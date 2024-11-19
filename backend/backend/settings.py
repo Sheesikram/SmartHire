@@ -47,7 +47,13 @@ INSTALLED_APPS = [
     'signup',
     'corsheaders',
     'getUserData',
-    'signout'
+    'signout',
+    'JobList',
+    'createjob',
+    'AI_job_title',
+    'Check_Ai_subs',
+    'checkout',
+    'Up_del_ret_job'
 ]
 
 MIDDLEWARE = [
@@ -146,7 +152,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER =  "sheesikram3@gmail.com"
 EMAIL_HOST_PASSWORD = "mbzv lnpy bswu bdzo"
-
+GROQ_API_KEY = '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'
 
 from datetime import timedelta
 
@@ -168,7 +174,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-# Optional: Ensure cookies behave correctly during development
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_HTTPONLY = True
+
+# settings.py
+
+STRIPE_TEST_PUBLIC_KEY = 'pk_test_51P0cjlP8GjJIjxDGEgyDXqRqhQThEMQl5KySJ1F7bhigoblE6MDvutJnx3n7LlTQx3HiA3zL9xYhnGwHTba03QpR00JWEq159G'
+STRIPE_TEST_SECRET_KEY = 'sk_test_51P0cjlP8GjJIjxDGImARCejVPE9OLerJ3u7UXMefovycp8Qv9Bmu3SpjI3QZ3BMuN6SumxxjM1wz8qgwHxiJ3f0c00gSSeHG7P'
+
+

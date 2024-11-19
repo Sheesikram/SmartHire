@@ -37,3 +37,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'github_link', 'linkedin_link', 'skills', 'phone_number',
             'experience', 'education', 'resume', 'profile_picture'  
         ]
+
+
+
+

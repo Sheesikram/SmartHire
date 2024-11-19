@@ -58,7 +58,7 @@ const ProfileLink = () => {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="flex items-center space-x-2 text-gray-300 hover:text-white transition duration-300 p-2 rounded-lg hover:bg-gray-700"
+        className="flex items-center space-x-2 hover:bg-gray-200 text-gray-300 hover:text-white transition duration-300 p-2 rounded-lg "
         aria-label="Profile Menu"
       >
         <div className="relative w-10 h-10 md:w-12 md:h-12 lg:w-12 lg:h-12">

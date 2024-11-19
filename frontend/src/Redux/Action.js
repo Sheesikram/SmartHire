@@ -35,3 +35,13 @@ export const Role_Action = (page) => ({
   type: 'Role',
   payload: page
 });
+
+export const search_bar_action = (c) => ({
+  type: 'search_bar',
+  payload: c
+});
+
+export const show_search = (c) => ({
+  type: 'show_search',
+  payload: c
+});

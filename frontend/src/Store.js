@@ -7,6 +7,7 @@ import { Root } from "./Redux/Root";
 const persistConfig = {
   key: "root",   
   storage,        
+  blacklist: ['show_search', 'show_search_reducer'],
 };
 
 const persistedReducer = persistReducer(persistConfig, Root);
