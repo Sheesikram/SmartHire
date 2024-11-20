@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth,TruncWeek,TruncDate
-from signup.models import User, Job, Subscription, Profit
+from signup.models import  User, Profile, Candidate, Recruiter, Subscription, Job,Profit
 from getUserData.JWT import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 import logging
+from rest_framework.pagination import PageNumberPagination
+
 
 # Configure logging for better error reporting
 logger = logging.getLogger(__name__)
@@ -86,3 +88,95 @@ def get_dashboard_stats(request):
             {'error': 'An unexpected error occurred', 'details': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+#Delete user
+class UserPagination(PageNumberPagination):
+    page_size = 10  # Default number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+@api_view(['GET'])
+@authentication_classes([])  # No authentication
+@permission_classes([])  # No permission checks
+def load_users(request):
+    try:
+        role = request.query_params.get('role')  # Optional role filter
+        email = request.query_params.get('email')  # Optional email filter
+
+        # Base query: Only include users with the role 'user'
+        users = User.objects.filter(role='user')
+        total_count = users.count()
+        print(total_count)
+        # Apply additional filters if provided
+        if role:
+            users = users.filter(role=role)
+        if email:
+            users = users.filter(email__icontains=email)  # Case-insensitive email filter
+
+        # Paginate results
+        paginator = UserPagination()
+        result_page = paginator.paginate_queryset(users, request)
+        users_data = [
+            {
+                'id': user.id,
+                'email': user.email,
+                'role': user.role,
+                'is_active': user.is_active,
+            }
+            for user in result_page
+        ]
+
+        return paginator.get_paginated_response(users_data)
+    except Exception as e:
+        return Response({'error': 'Error loading users', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['DELETE'])
+@authentication_classes([])  # No authentication
+@permission_classes([])  # No permission checks
+def delete_user(request, user_id):
+    """
+    API for admin to delete a user by ID and all related data.
+    """
+    print(user_id)
+    try:
+        # Ensure the requester is an admin
+        print("user_id2",user_id)
+
+      #  if request.user.role != 'admin':
+       #     print("I am here3",user_id)
+        #    return Response({'error': 'Only admins can delete users'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Fetch the user by ID
+        print("I am here4",user_id)
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Prevent deleting themselves
+        if user == request.user:
+            return Response({'error': 'Admins cannot delete their own account'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Start deleting associated data
+        print("Deleting Profile")
+        Profile.objects.filter(user=user).delete()
+
+        print("Deleting Candidate")
+        Candidate.objects.filter(profile__user=user).delete()
+
+        print("Deleting Recruiter")
+        Recruiter.objects.filter(profile__user=user).delete()
+
+        print("Deleting Subscription")
+        Subscription.objects.filter(user=user).delete()
+
+        print("Deleting Jobs")
+        Job.objects.filter(recruiter__profile__user=user).delete()
+
+        # Finally, delete the user
+        user.delete()
+
+        return Response({'message': f'User with ID {user_id} and all related data have been deleted'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(f"Error: {e}")
+        return Response({'error': 'Error deleting user', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
