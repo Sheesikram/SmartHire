@@ -74,20 +74,23 @@ def create_checkout_session(request):
         return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+from decimal import Decimal
+
 def increment_profit_by_50():
     try:
-        # Get or create the profit entry (assuming a single entry in the Profit table)
-        profit, created = Profit.objects.get_or_create(id=1, defaults={'net_profit': 0.00})
-        
-        # Increment the net profit by 50 (in dollars)
-        profit.net_profit += 50.00
+        # Try to get the profit entry
+        profit = Profit.objects.get(id=1)
+        # Increment the net profit by 50 (use Decimal for accuracy)
+        profit.net_profit += Decimal('50.00')
         profit.save()
-
         print("Profit updated successfully:", profit.net_profit)
-
+    except Profit.DoesNotExist:
+        # If no entry exists, create one with the initial profit value
+        profit = Profit.objects.create(id=1, net_profit=Decimal('50.00'))
+        print("Profit entry created with initial value:", profit.net_profit)
     except Exception as e:
         print("Error updating profit:", str(e))
-        
+
 
 @api_view(['POST'])
 @authentication_classes([CustomJWTAuthentication])
