@@ -30,7 +30,7 @@ from Check_Ai_subs.views import has_ai_subscription,has_prac_subscription
 from checkout.views import create_checkout_session,verify_payment
 from Up_del_ret_job.views import get_job_by_id,update_job,delete_job
 from Dashboard.views import get_dashboard_stats
-from Dashboard.views import load_users,delete_user
+from Dashboard.views import load_users,delete_user,subscribers,delete_subscription
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -63,6 +63,8 @@ urlpatterns = [
     path('dashboard/', get_dashboard_stats, name='dashboard'),
     path('all_users/', load_users, name='load_users'),
     path('users/<int:user_id>/', delete_user, name='delete_user'),
+    path('subscribers/', subscribers, name='subscribers'),
+    path('delete_subscription/<int:subscription_id>/', delete_subscription, name='delete_subscription'),
 
 
 

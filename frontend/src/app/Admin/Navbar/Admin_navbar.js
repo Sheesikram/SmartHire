@@ -33,17 +33,7 @@ const AdminNavbar = () => {
       {/* Navbar */}
       <nav className="bg-white shadow-md fixed top-0 w-full z-50 border-b border-gray-200">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-          {/* Logo and Admin Panel Title */}
-          <div className="flex items-center space-x-4">
-            <img
-              src={bgImage.src}
-              alt="Logo"
-              className="h-10 w-10 rounded-full"
-            />
-            <span className="text-xl font-semibold text-gray-800">Admin Panel</span>
-          </div>
-
-          {/* Hamburger Menu Button */}
+          {/* Hamburger Menu Button (Moved to Left) */}
           <button
             onClick={toggleDrawer}
             className="text-gray-700 hover:text-blue-500 focus:outline-none transition duration-300"
@@ -51,6 +41,16 @@ const AdminNavbar = () => {
           >
             <FontAwesomeIcon icon={faBars} className="h-6 w-6" />
           </button>
+
+          {/* Logo and Admin Panel Title (Moved to Right) */}
+          <div className="flex items-center space-x-4 ml-auto">
+            <img
+              src={bgImage.src}
+              alt="Logo"
+              className="h-10 w-10 rounded-full"
+            />
+            <span className="text-xl font-semibold text-gray-800">Admin Panel</span>
+          </div>
         </div>
       </nav>
 
@@ -75,13 +75,13 @@ const AdminNavbar = () => {
           <div className="flex flex-col space-y-4 px-4">
             <DrawerLink
               icon={faUserMinus}
-              label="Delete People"
+              label="Users"
               path="/Admin/deleteusers"
               router={router}
             />
             <DrawerLink
               icon={faDollarSign}
-              label="Delete Subscriptions"
+              label="Subscriptions"
               path="/Admin/deletesubscription"
               router={router}
             />
