@@ -31,23 +31,20 @@ const Protect = ({ children }) => {
         </>;
     }
 
-    console.log("role", role);
 
     if (role === "admin") {
-        console.log("admin role")
-        if ( router === "/Admin/deleteusers" || router === "/Admin/deletesubscription" || router === "/Admin/dashboard"||  router === "/error" ) {
+        if ( router === "/Admin/deleteusers" || router === "/Admin/deletesubscription" || router === "/Admin/dashboard"||  router === "/error"  || router === "/Admin/deletejob" || router === "/Admin/report") {
             return <>{children}</>;
         } else {
             route.push("/error");
             return null;
         }
     } else if (role === "Candidate") {
-        console.log("customer role")
 
         if (
             router=="/Users/Home"   || router=="/Users/Jobs"  ||
             router=="/Users/Notifications"  || router=="/Users/Profile"  ||  router=="/Users/Practice"  || 
-            router==="/error"
+            router==="/error" ||  router.startsWith("/Users/Jobs/")
         ) {
             return <>{children}</>;
         } else {
@@ -57,7 +54,6 @@ const Protect = ({ children }) => {
         
     }
     else if (role === "Recruiter") {
-        console.log("customer role")
 
         if (
             router=="/Users/Home"   || router=="/Users/Posts"  ||
@@ -72,7 +68,6 @@ const Protect = ({ children }) => {
         
     }
      else if (role === "Guest") {
-        console.log("guest role")
 
         if (
             router=="/Users/Home" ||

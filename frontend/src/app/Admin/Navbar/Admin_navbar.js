@@ -6,17 +6,24 @@ import {
   faUserMinus,
   faChartBar,
   faSignOutAlt,
+  faExclamationTriangle,
   faDollarSign,
+  faUser,
+  faBriefcase
 } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import "../../globals.css";
 import bgImage from "../../Photos/bg.png";
+import { useDispatch, useSelector } from "react-redux";
+import { admin_search_bar_action } from "@/Redux/Action";
+
 
 const AdminNavbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
-
+  const searchQuery = useSelector((state) => state.admin_search_bar_reducer);
+  const dispatch = useDispatch();
   const toggleDrawer = () => setIsDrawerOpen((prev) => !prev);
 
   const handleLogout = async () => {
@@ -74,23 +81,47 @@ const AdminNavbar = () => {
           {/* Navigation Links */}
           <div className="flex flex-col space-y-4 px-4">
             <DrawerLink
-              icon={faUserMinus}
+              icon={faUser}
               label="Users"
               path="/Admin/deleteusers"
               router={router}
+              dispatch={dispatch}
             />
             <DrawerLink
               icon={faDollarSign}
               label="Subscriptions"
               path="/Admin/deletesubscription"
               router={router}
+              dispatch={dispatch}
+
             />
+             <DrawerLink
+              icon={faBriefcase}
+              label="Jobs"
+              path="/Admin/deletejob"
+              router={router}
+              dispatch={dispatch}
+
+            />
+             <DrawerLink
+              icon={faExclamationTriangle}
+              label="Reported Jobs"
+              path="/Admin/report"
+              router={router}
+              dispatch={dispatch}
+
+            />
+
             <DrawerLink
               icon={faChartBar}
               label="Analytics"
               path="/Admin/dashboard"
               router={router}
+              dispatch={dispatch}
+
             />
+           
+            
           </div>
 
           {/* Logout Button */}
@@ -118,10 +149,13 @@ const AdminNavbar = () => {
 };
 
 // DrawerLink Component
-const DrawerLink = ({ icon, label, path, router }) => (
+const DrawerLink = ({ icon, label, path, router,dispatch }) => (
   <button
     className="flex items-center space-x-4 text-gray-700 hover:bg-gray-200 hover:text-blue-500 px-4 py-2 transition duration-300 rounded-lg w-full text-left"
-    onClick={() => router.push(path)}
+    onClick={async() => {
+      await dispatch(admin_search_bar_action("")); // Dispatch the action with the updated search term
+      router.push(path)
+    }}
   >
     <FontAwesomeIcon icon={icon} className="h-5 w-5" />
     <span className="font-medium">{label}</span>

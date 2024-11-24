@@ -59,7 +59,6 @@ def get_jobs_for_recruiter(request):
         recruiter = Recruiter.objects.get(profile__user=user)
         # Get search term from the query parameters, if available
         search_term = request.GET.get('search', '').strip()
-        print(search_term)
         # Filter jobs based on the search term if provided
         jobs_query = Job.objects.filter(recruiter=recruiter)
         
@@ -106,7 +105,6 @@ def get_all_jobs(request):
     """
     API to get all jobs, optionally with a search term.
     """
-    print("hello from all jobs")
 
     # Get the search term from the query parameters (if provided)
     search_term = request.GET.get('search', '').strip()
@@ -122,7 +120,6 @@ def get_all_jobs(request):
             jobs_query = jobs_query.filter(job_name__icontains=search_term)
 
         # Debug: Check how many jobs are returned after filtering
-        print(f"Filtered query count: {jobs_query.count()}")
 
         # Apply pagination
         paginator = Job_Pagination()
@@ -135,7 +132,6 @@ def get_all_jobs(request):
         paginated_jobs = paginator.paginate_queryset(jobs_query, request)
 
         # Debug: Check if pagination is correctly applied
-        print(f"Paginated jobs count: {len(paginated_jobs)}")
 
         # Prepare job data for the response
         job_data = [
@@ -160,7 +156,6 @@ def get_all_jobs(request):
 
     except Exception as e:
         # Handle any unexpected errors and print the exception details for debugging
-        print(f"Error occurred: {str(e)}")
         return Response(
             {'error': 'An unexpected error occurred', 'details': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -9,19 +9,14 @@ from .JWT import CustomJWTAuthentication
 @authentication_classes([CustomJWTAuthentication])
 @permission_classes([IsAuthenticated])
 def get_user_data(request):
-    print("Received request for user data")
-    print("User from request:", request.user)
 
     if not request.user.is_authenticated:
-        print("User not authenticated.")
         return Response({"error": "User not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 
     try:
         profile = Profile.objects.get(user=request.user)
-        print("Profile found:", profile)
 
         profile_picture = profile.profile_picture.name if profile.profile_picture else None
-        print("Raw Profile Picture:", profile_picture)
 
         if profile_picture and "googleusercontent.com" in profile_picture:
             profile_picture_url = profile_picture  
@@ -30,7 +25,6 @@ def get_user_data(request):
         else:
             profile_picture_url = None 
 
-        print("Final Profile Picture URL:", profile_picture_url)
 
         user_data = {
             "first_name": profile.first_name,
@@ -40,7 +34,6 @@ def get_user_data(request):
         return Response({"user_data": user_data}, status=status.HTTP_200_OK)
 
     except Profile.DoesNotExist:
-        print("Profile not found.")
         return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -50,10 +43,8 @@ def get_user_data(request):
 @authentication_classes([CustomJWTAuthentication])
 @permission_classes([IsAuthenticated])
 def get_user_role(request):
-    print("hello it is running")
     user_role_param = request.query_params.get('role')
     user = request.user  
-    print(user.role,user_role_param)
     if not user_role_param or not user:
         return Response(
             {'error': 'User role or user ID not provided.'},

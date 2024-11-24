@@ -22,13 +22,11 @@ stripe.api_key = settings.STRIPE_TEST_SECRET_KEY  # Ensure you set this key corr
 @permission_classes([IsAuthenticated])
 def create_checkout_session(request):
     try:
-        print("Received request:", request.data)  # Log the incoming request
         user = request.user
         job_id = request.data.get('job_id')  # Retrieve job_id from request data
         interview_type = request.data.get('interview_type', 'ai')
 
-        if not job_id:
-            print("No job_id provided, using default success URL")
+        
 
         metadata = {
             'user_id': user.id,
@@ -62,7 +60,6 @@ def create_checkout_session(request):
             metadata=metadata
         )
 
-        print("Checkout session created:", checkout_session)  # Log the checkout session
 
         # After successful creation of checkout session, increment the profit
         increment_profit_by_50()
@@ -70,7 +67,6 @@ def create_checkout_session(request):
         return Response({'sessionId': checkout_session.id}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        print("Error:", str(e))  # Log any error
         return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -83,13 +79,10 @@ def increment_profit_by_50():
         # Increment the net profit by 50 (use Decimal for accuracy)
         profit.net_profit += Decimal('50.00')
         profit.save()
-        print("Profit updated successfully:", profit.net_profit)
     except Profit.DoesNotExist:
         # If no entry exists, create one with the initial profit value
         profit = Profit.objects.create(id=1, net_profit=Decimal('50.00'))
-        print("Profit entry created with initial value:", profit.net_profit)
-    except Exception as e:
-        print("Error updating profit:", str(e))
+    
 
 
 @api_view(['POST'])

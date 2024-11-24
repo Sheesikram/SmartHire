@@ -35,7 +35,6 @@ def get_recruiter_company(request):
         serializer = RecruiterSerializer(recruiter)
 
         # Print the serialized data
-        print(serializer.data)
 
         # Check if company_name is empty, if so, return "O"
         company_name = serializer.data.get('company_name', "O")
@@ -57,7 +56,6 @@ def get_recruiter_company(request):
         )
     except Exception as e:
         # Log and return exception for debugging
-        print(f"Error: {str(e)}")
         return Response(
             {'error': 'An unexpected error occurred', 'details': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -89,7 +87,6 @@ def create_job(request):
             recruiter.company_name = company_name
             recruiter.save()
 
-        print("company_name:", company_name, recruiter)
 
         # Prepare job data from the request
         job_data = {
@@ -103,21 +100,18 @@ def create_job(request):
             'recruiter': recruiter.profile_id,  # Use recruiter.id as the foreign key
         }
 
-        print("Job Data:", job_data)
 
         # Serialize the job data and check if it's valid
         job_serializer = JobSerializer(data=job_data)
 
         if job_serializer.is_valid():
             job_serializer.save()  # Save the job entry
-            print("Job Created Successfully:", job_serializer.data)
             return Response(
                 job_serializer.data,
                 status=status.HTTP_201_CREATED
             )
         else:
             # Log the validation errors for debugging
-            print("Validation Errors:", job_serializer.errors)
             return Response(
                 job_serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST

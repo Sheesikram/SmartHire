@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'AI_job_title',
     'Check_Ai_subs',
     'checkout',
-    'Up_del_ret_job'
+    'Up_del_ret_job',
+    'report'
 ]
 
 MIDDLEWARE = [

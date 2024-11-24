@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth,TruncWeek,TruncDate
-from signup.models import  User, Profile, Candidate, Recruiter, Subscription, Job,Profit
+from signup.models import  User, Profile, Candidate, Recruiter, Subscription, Job,Profit,Report
 from getUserData.JWT import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 import logging
@@ -21,31 +21,24 @@ def get_dashboard_stats(request):
     try:
         # Count users with the role 'user'
         user_count = User.objects.filter(role='user').count()
-        print("hello", user_count)
         
         # Calculate total net profit (assuming net profit is stored in Profit)
         total_net_profit = Profit.objects.aggregate(Sum('net_profit'))['net_profit__sum'] or 0
-        print("hello", total_net_profit)
 
         # Count total jobs
         total_jobs = Job.objects.count()
-        print("hello", total_jobs)
 
         # Count subscriptions
         total_subscriptions = Subscription.objects.count()
-        print("hello", total_subscriptions)
 
         # Jobs by Category (assuming 'skills' field in Job model)
         jobs_by_category = Job.objects.values('skills').annotate(count=Count('id')).order_by('skills')
-        print("hello", jobs_by_category)
 
         # Jobs by Preference (assuming 'employment_type' field in Job model)
         jobs_by_preference = Job.objects.values('employment_type').annotate(count=Count('employment_type'))
-        print("hello", jobs_by_preference)
 
         # Jobs by Workplace (assuming 'workplace_type' field in Job model)
         jobs_by_workplace = Job.objects.values('workplace_type').annotate(count=Count('id')).order_by('workplace_type')
-        print("hello", jobs_by_workplace)
 
         # User Signups (count jobs grouped by month)
         jobs_post = Job.objects.annotate(day=TruncDate('created_at')) \
@@ -62,7 +55,6 @@ def get_dashboard_stats(request):
         
         # Convert the 'month' to a string format that the response can handle
         jobs_post_data = [{'day': item['day'].strftime('%Y-%m-%d'), 'count': item['count']} for item in jobs_post]        
-        print("hello", jobs_post)
 
         
 
@@ -77,7 +69,6 @@ def get_dashboard_stats(request):
             'jobs_by_workplace': jobs_by_workplace_data,
             'Jobs_post': jobs_post_data,
         }
-        print("hello", response_data)
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -98,8 +89,8 @@ class UserPagination(PageNumberPagination):
     max_page_size = 100
 
 @api_view(['GET'])
-@authentication_classes([])  # No authentication
-@permission_classes([])  # No permission checks
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
 def load_users(request):
     try:
         # Get the role and email filters from query parameters
@@ -110,8 +101,7 @@ def load_users(request):
         users = User.objects.filter(role='user')
 
         # Apply additional filters if provided
-        if role:
-            users = users.filter(role=role)
+        
         if email:
             users = users.filter(email__icontains=email)  # Case-insensitive email filter
 
@@ -141,23 +131,20 @@ def load_users(request):
         return Response({'error': 'Error loading users', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])
-@authentication_classes([])  # No authentication
-@permission_classes([])  # No permission checks
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
 def delete_user(request, user_id):
     """
     API for admin to delete a user by ID and all related data.
     """
-    print(user_id)
     try:
         # Ensure the requester is an admin
-        print("user_id2",user_id)
 
       #  if request.user.role != 'admin':
        #     print("I am here3",user_id)
         #    return Response({'error': 'Only admins can delete users'}, status=status.HTTP_403_FORBIDDEN)
 
         # Fetch the user by ID
-        print("I am here4",user_id)
         user = User.objects.filter(id=user_id).first()
         if not user:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -167,34 +154,28 @@ def delete_user(request, user_id):
             return Response({'error': 'Admins cannot delete their own account'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Start deleting associated data
-        print("Deleting Profile")
         Profile.objects.filter(user=user).delete()
 
-        print("Deleting Candidate")
         Candidate.objects.filter(profile__user=user).delete()
 
-        print("Deleting Recruiter")
         Recruiter.objects.filter(profile__user=user).delete()
 
-        print("Deleting Subscription")
         Subscription.objects.filter(user=user).delete()
 
-        print("Deleting Jobs")
         Job.objects.filter(recruiter__profile__user=user).delete()
 
         # Finally, delete the user
-        user.delete()
+        User.objects.filter(id=user_id).first().delete()
 
         return Response({'message': f'User with ID {user_id} and all related data have been deleted'}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(f"Error: {e}")
         return Response({'error': 'Error deleting user', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 #subscription
 @api_view(['GET'])
-@authentication_classes([])  # No authentication
-@permission_classes([])  # No permission checks
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
 def subscribers(request):
     try:
         # Get the email filter and page number from query parameters
@@ -242,8 +223,8 @@ def subscribers(request):
         return Response({'error': 'Error loading subscriptions', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])
-@authentication_classes([])  # No authentication
-@permission_classes([])  # No permission checks
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
 def delete_subscription(request, subscription_id):
     try:
         print("Hello",subscription_id)
@@ -259,3 +240,189 @@ def delete_subscription(request, subscription_id):
     except Subscription.DoesNotExist:
         # Handle case where subscription is not found
         return Response({'detail': 'Subscription not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+class JobPagination(PageNumberPagination):
+    page_size = 10  # Default number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+@api_view(['GET'])
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
+def load_jobs(request):
+    """
+    API to fetch all jobs or filter by job_name if a name is provided.
+    """
+    try:
+        name = request.query_params.get('name')  # Optional filter by job_name
+
+        # Base query: Fetch all jobs
+        jobs = Job.objects.all()
+
+        # Apply filter if 'name' is provided
+        if name:
+            jobs = jobs.filter(job_name__icontains=name)  # Case-insensitive filter
+
+        # Total count of filtered jobs
+        total_count = jobs.count()
+
+        # Paginate results
+        paginator = JobPagination()
+        result_page = paginator.paginate_queryset(jobs, request)
+
+        # Prepare response data
+        jobs_data = [
+            {
+                'id': job.id,
+                'job_name': job.job_name,
+                'workplace_type': job.workplace_type,
+                'job_location': job.job_location,
+                'employment_type': job.employment_type,
+                'created_at': job.created_at,
+                'skills':job.skills
+            }
+            for job in result_page
+        ]
+
+        # Return paginated response with total count
+        return paginator.get_paginated_response({
+            'jobs': jobs_data,
+            'total_count': total_count
+        })
+
+    except Exception as e:
+        return Response({'error': 'Error loading jobs', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['DELETE'])
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_job(request, job_id):
+    """
+    API to delete a specific job by its ID.
+    """
+    try:
+        # Fetch the job by ID
+        job = Job.objects.filter(id=job_id).first()
+        if not job:
+            return Response({'error': 'Job not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Delete the job
+        job.delete()
+
+        return Response({'message': f'Job with ID {job_id} has been deleted'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'error': 'Error deleting job', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['GET'])
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
+def load_reported_jobs(request):
+    """
+    API to fetch all reported jobs, search by job_name, or fetch a single reported job by job_id.
+    """
+    try:
+        job_id = request.query_params.get('job_id')  # Optional parameter to fetch a specific job
+        title = request.query_params.get('title')  # Optional filter by job_name (from the Job model)
+        
+        # Base query: Fetch all reported jobs
+        reported_jobs = Report.objects.all()
+
+        # Filter by job title if provided
+        if title:
+            # Ensure title is not None and filter using icontains for partial case-insensitive match
+            reported_jobs = reported_jobs.filter(job__job_name__icontains=title.strip())
+
+        # Filter by job ID if provided
+        if job_id:
+            reported_jobs = reported_jobs.filter(job_id=job_id)
+
+        # Total count of filtered jobs
+        total_count = reported_jobs.count()
+
+        # If no jobs are found, prepare an empty response
+        if total_count == 0:
+            return Response({
+                'reported_jobs': [],
+                'total_count': 0
+            }, status=status.HTTP_200_OK)
+
+        # Paginate results
+        paginator = JobPagination()
+        result_page = paginator.paginate_queryset(reported_jobs, request)
+
+        # Prepare response data
+        reported_jobs_data = [
+            {
+                'id': reported_job.id,
+                'job_id': reported_job.job.id,
+                'job_name': reported_job.job.job_name,  # Getting job_name from Job model
+                'job_location': reported_job.job.job_location,  # Getting job_location from Job model
+                'workplace_type': reported_job.job.workplace_type,  # Getting workplace_type from Job model
+                'employment_type': reported_job.job.employment_type,  # Getting employment_type from Job model
+                'skills': reported_job.job.skills,
+                'description': reported_job.job.description,
+                'company_name': reported_job.job.recruiter.company_name
+            }
+            for reported_job in result_page
+        ]
+
+        # Return paginated response with total count
+        return paginator.get_paginated_response({
+            'reported_jobs': reported_jobs_data,
+            'total_count': total_count
+        })
+
+    except Exception as e:
+        return Response({'error': 'Error loading reported jobs', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['DELETE'])
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_job_and_reports(request, job_id):
+    """
+    API to delete a job from the Job table and cascade delete related reports.
+    """
+    try:
+        # Fetch the job by ID
+        job = Job.objects.filter(id=job_id).first()
+        if not job:
+            return Response({'error': 'Job not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Delete the job (this will also delete related reports if foreign key is set with cascade)
+        job.delete()
+
+        return Response({'message': 'Job and related reports deleted successfully'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'error': 'Error deleting job', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['DELETE'])
+@authentication_classes([CustomJWTAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_report(request, report_id):
+    """
+    API to delete a report from the Report table without affecting the Job table.
+    """
+    try:
+        # Fetch the report by ID
+        report = Report.objects.filter(id=report_id).first()
+        if not report:
+            return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Delete the report
+        report.delete()
+
+        return Response({'message': 'Report deleted successfully'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'error': 'Error deleting report', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

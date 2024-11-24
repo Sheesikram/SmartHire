@@ -59,7 +59,7 @@ const CandidateJobs = () => {
     };
 
     const handleJobClick = (jobId) => {
-        
+        router.push(`Jobs/${jobId}`);
     };
 
     const handleApply = (jobId) => {

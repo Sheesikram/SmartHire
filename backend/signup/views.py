@@ -63,7 +63,6 @@ def verify_otp(request):
 
 @api_view(['POST'])
 def signup(request):
-    print(request.data)
     """Handle user signup after OTP verification."""
     email = request.data.get('email')
     password = request.data.get('password')

@@ -158,3 +158,10 @@ class Profit(models.Model):
 
     def __str__(self):
         return f"Profit ID: {self.id}, Net Profit: {self.net_profit}"
+
+class Report(models.Model):
+    job = models.ForeignKey('Job', on_delete=models.CASCADE, related_name='reports')
+    # Add any additional attributes if needed, but for now only the foreign key is required.
+
+    def __str__(self):
+        return f"Report for {self.job.job_name}"

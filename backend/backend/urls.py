@@ -28,9 +28,10 @@ from createjob.views import get_recruiter_company,create_job
 from AI_job_title.views import enhance_job_title
 from Check_Ai_subs.views import has_ai_subscription,has_prac_subscription
 from checkout.views import create_checkout_session,verify_payment
-from Up_del_ret_job.views import get_job_by_id,update_job,delete_job
+from Up_del_ret_job.views import get_job_by_id,update_job,delete_job,get_job_id
 from Dashboard.views import get_dashboard_stats
-from Dashboard.views import load_users,delete_user,subscribers,delete_subscription
+from Dashboard.views import load_users,delete_user,subscribers,delete_subscription,delete_job,load_jobs,load_reported_jobs,delete_job_and_reports,delete_report
+from report.views import create_report
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -65,7 +66,12 @@ urlpatterns = [
     path('users/<int:user_id>/', delete_user, name='delete_user'),
     path('subscribers/', subscribers, name='subscribers'),
     path('delete_subscription/<int:subscription_id>/', delete_subscription, name='delete_subscription'),
-
-
+    path('all_jobs/', load_jobs, name='load_jobs'),
+    path('job/<int:job_id>/', delete_job, name='delete_job'),
+    path('get_jobs/<int:job_id>/', get_job_id, name='get_jobs'),
+    path('report/', create_report, name='create_report'),   
+    path('load_reports/', load_reported_jobs, name='load_reports'),
+    path('delete_job_report/<int:job_id>/', delete_job_and_reports, name='delete_job_and_reports'),
+    path('delete_report/<int:report_id>/', delete_report, name='delete_report'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

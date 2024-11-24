@@ -37,7 +37,6 @@ const CreateJob = () => {
                 setsubscription(response1.data.ai_subscription);
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching recruiter data:", error);
                 setLoading(false);
             }
         };
@@ -49,7 +48,6 @@ const CreateJob = () => {
         sessionStorage.setItem('formData', JSON.stringify(formData));
 
         try {
-            console.log("Sending payment request...");
             const response = await axios.post(
                 'http://127.0.0.1:3001/create_checkout_session/',
                 { interview_type: 'ai' },
@@ -59,9 +57,7 @@ const CreateJob = () => {
                 }
             );
 
-            console.log("Response received:", response);
             if (response.status === 200) {
-                console.log('Checkout session created successfully');
                 const stripePromise = await loadStripe('pk_test_51P0cjlP8GjJIjxDGEgyDXqRqhQThEMQl5KySJ1F7bhigoblE6MDvutJnx3n7LlTQx3HiA3zL9xYhnGwHTba03QpR00JWEq159G');
                 const stripe = await stripePromise;
 
@@ -70,15 +66,12 @@ const CreateJob = () => {
                 });
 
                 if (error) {
-                    console.error('Error redirecting to checkout:', error);
                     toast.error("Failed to initiate payment. Please try again.");
                 }
             } else {
-                console.error('Checkout session creation failed');
                 toast.error("Checkout failed. Please try again later.");
             }
         } catch (error) {
-            console.error('Error initiating payment:', error);
             toast.error("An error occurred while initiating payment. Please try again.");
         }
     };
@@ -96,14 +89,12 @@ const CreateJob = () => {
             setPage(3);
 
         }
-        console.log(savedFormData)
         // Verify payment
         const sessionId = new URLSearchParams(window.location.search).get('session_id');
         if (sessionId) {
             axios.post('http://127.0.0.1:3001/verify_payment/', { session_id: sessionId }, { withCredentials: true })
                 .then(response => {
                     if (response.status === 200) {
-                        console.log("Payment successful and user updated.");
                         // Clear sessionStorage after successful payment verification
                         sessionStorage.removeItem('formData');
                         setsubscription(true);
@@ -228,7 +219,6 @@ const CreateJob = () => {
         try {
             // Replace with your AI service for title generation
             const response = await axios.post("http://127.0.0.1:3001/generate-job-title/", { prompt: formData.job_name }, { withCredentials: true });
-            console.log(response.data.professional_job_title)
             if (response.data?.professional_job_title) {
                 setFormData({ ...formData, job_name: response.data.professional_job_title });
                 setValidationErrors((prevErrors) => ({

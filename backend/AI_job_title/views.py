@@ -56,7 +56,6 @@ def enhance_job_title(request):
         response = structured_llm.invoke(prompt)  # Correctly using the structured_llm
         
         # Debug: Print the raw response
-        print("Raw Response:", response)
 
         # Check if the response contains the expected field
         if hasattr(response, 'professional_job_title'):
@@ -72,7 +71,6 @@ def enhance_job_title(request):
 
     except Exception as e:
         # Log the exception and return an error response
-        print(f"Error: {str(e)}")
         return Response(
             {'error': 'An unexpected error occurred', 'details': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR

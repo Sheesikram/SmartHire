@@ -29,7 +29,6 @@ const UpdateJob = ({ params }) => {
     const [subscription, setsubscription] = useState(false);
     const [error, setError] = useState(null); // State for error message
 
-    console.log(params.id)
 
 
     useEffect(() => {
@@ -69,7 +68,6 @@ const UpdateJob = ({ params }) => {
               setError("No Post Available"); // Set error message if job doesn't exist
             }
           } catch (error) {
-            console.error("Error fetching job data:", error);
             setError("No Post Available"); // Set error message in case of an error
           } finally {
             setLoading(false); // Stop loading in all cases
@@ -84,7 +82,6 @@ const UpdateJob = ({ params }) => {
         sessionStorage.setItem('formData', JSON.stringify(formData));
 
         try {
-            console.log("Sending payment request...");
             const response = await axios.post(
                 'http://127.0.0.1:3001/create_checkout_session/',
                 { interview_type: 'ai',job_id:  params.id.toString() },
@@ -94,9 +91,7 @@ const UpdateJob = ({ params }) => {
                 }
             );
 
-            console.log("Response received:", response);
             if (response.status === 200) {
-                console.log('Checkout session created successfully');
                 const stripePromise = await loadStripe('pk_test_51P0cjlP8GjJIjxDGEgyDXqRqhQThEMQl5KySJ1F7bhigoblE6MDvutJnx3n7LlTQx3HiA3zL9xYhnGwHTba03QpR00JWEq159G');
                 const stripe = await stripePromise;
 
@@ -131,14 +126,12 @@ const UpdateJob = ({ params }) => {
             setPage(3);
 
         }
-        console.log(savedFormData)
         // Verify payment
         const sessionId = new URLSearchParams(window.location.search).get('session_id');
         if (sessionId) {
             axios.post('http://127.0.0.1:3001/verify_payment/', { session_id: sessionId }, { withCredentials: true })
                 .then(response => {
                     if (response.status === 200) {
-                        console.log("Payment successful and user updated.");
                         // Clear sessionStorage after successful payment verification
                         sessionStorage.removeItem('formData');
                         setsubscription(true);
@@ -263,7 +256,6 @@ const UpdateJob = ({ params }) => {
         try {
             // Replace with your AI service for title generation
             const response = await axios.post("http://127.0.0.1:3001/generate-job-title/", { prompt: formData.job_name }, { withCredentials: true });
-            console.log(response.data.professional_job_title)
             if (response.data?.professional_job_title) {
                 setFormData({ ...formData, job_name: response.data.professional_job_title });
                 setValidationErrors((prevErrors) => ({

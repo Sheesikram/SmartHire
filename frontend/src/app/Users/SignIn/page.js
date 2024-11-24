@@ -68,7 +68,6 @@ const SignIn = () => {
         try {
             const response = await axios.post('http://127.0.0.1:3001/login/', { email, password }, { withCredentials: true });
             const userRole = response.data.user.role; // Get the user's role
-            console.log(userRole);
             if (userRole === "user") {
                 await dispatch(Role_Action("Candidate"));
                 router.push("/Users/Home");

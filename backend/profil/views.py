@@ -109,9 +109,6 @@ def update_profile(request):
     user = request.user  # Authenticated user
     role = request.data.get('role')
     
-    print("User:", user)  # Check user information
-    print("Role from request:", role)
-    print("Request Data:", request.data)  # Check full request data
 
     if not user:
         return Response(
@@ -122,7 +119,6 @@ def update_profile(request):
     try:
         # Retrieve or create the user's profile
         profile, created = Profile.objects.get_or_create(user=user)
-        print("Profile Retrieved or Created:", profile)
 
         # Update general profile fields
         profile.first_name = request.data.get('first_name', profile.first_name)
@@ -140,9 +136,7 @@ def update_profile(request):
         # Attempt to save profile
         try:
             profile.save()
-            print("Profile saved successfully")
         except Exception as save_error:
-            print("Error Saving Profile:", save_error)
             return Response(
                 {'error': 'Failed to save profile data.', 'details': str(save_error)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -151,20 +145,16 @@ def update_profile(request):
         # Candidate or Recruiter logic
         if role == 'Candidate' or user.role == 'Candidate':
             candidate, _ = Candidate.objects.get_or_create(profile=profile)
-            print("Candidate object:", candidate)
             candidate.skills = request.data.get('skills', candidate.skills)
             candidate.education = request.data.get('education', candidate.education)
             candidate.github_link = request.data.get('github_link', candidate.github_link)
             candidate.save()
-            print("Candidate profile saved")
 
         elif role == 'Recruiter' or user.role == 'Recruiter':
             recruiter, _ = Recruiter.objects.get_or_create(profile=profile)
-            print("Recruiter object:", recruiter)
             recruiter.company_name = request.data.get('company_name', recruiter.company_name)
             recruiter.company_website = request.data.get('company_website', recruiter.company_website)
             recruiter.save()
-            print("Recruiter profile saved")
 
         # Prepare updated response data
         updated_data = {
@@ -186,7 +176,6 @@ def update_profile(request):
         return Response({'message': 'Profile updated successfully', 'profile': updated_data}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        print("Unexpected Error:", e)
         return Response(
             {'error': 'An unexpected error occurred while updating', 'details': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR

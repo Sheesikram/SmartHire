@@ -161,7 +161,6 @@ const Profile = () => {
       });
       setSuccessMessage("Profile updated successfully!");
     } catch (error) {
-      console.error("Error updating profile:", error);
       setError("Error updating profile.");
     }
   };

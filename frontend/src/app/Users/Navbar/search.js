@@ -16,8 +16,6 @@ const SearchBar = () => {
     await dispatch(search_bar_action(e.target.value)); // Dispatch the action with the updated search term
   };
   const showSearch = useSelector((state) => state.show_search_reducer);
-  console.log('Show search:', showSearch); // Debugging line
-  console.log('Show Search after dispatch:', showSearch); // Log to confirm the value
   
   if (!showSearch) {
     return null; // Don't render search bar if show_search_reducer is false
