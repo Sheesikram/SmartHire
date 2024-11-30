@@ -273,7 +273,7 @@ const CreateJob = () => {
     return (
         <div className="flex flex-col items-center min-h-screen bg-gray-50 py-10 px-4 lg:px-8" style={{ backgroundColor: "#F4F2EE", paddingTop: "4rem" }}>
             <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-8 sm:p-12 lg:p-16">
-                <h1 className="text-3xl font-bold text-center text-blue-700 mb-8">Job Post</h1>
+                <h1 className="text-3xl font-bold text-center text-[#0073b1] mb-8">Job Post</h1>
                 <form className="space-y-6">
                     {page === 1 && (
                         <>
@@ -312,7 +312,7 @@ const CreateJob = () => {
 
                                         <button
                                             type="button"
-                                            className="absolute right-0 top-1/2 transform -translate-y-1/2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-md focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-30 shadow-lg hover:shadow-xl active:scale-95"
+                                            className="absolute right-0 top-1/2 transform -translate-y-1/2 py-3 px-4 bg-gradient-to-r from-[#0073b1] to-indigo-700 text-white rounded-md focus:outline-none focus:ring-4 focus:ring-[#0073b1] focus:ring-opacity-30 shadow-lg hover:shadow-xl active:scale-95"
                                             onClick={handleGenerateTitle}
                                         >
                                             <SiGooglegemini className="w-6 h-6 text-white" />
@@ -498,7 +498,7 @@ const CreateJob = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                className="px-6 py-2 bg-[#0073b1] text-white rounded-lg  transition"
                                 onClick={handleSubmit}
                             >
                                 Submit Job Posting
@@ -517,7 +517,7 @@ const CreateJob = () => {
                             </button>
                             <button
                                 type="button"
-                                className={`px-6 py-2 rounded-lg transition ${page === 3 ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'}`}
+                                className={`px-6 py-2 rounded-lg transition ${page === 3 ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-[#0073b1] text-white  cursor-pointer'}`}
                                 onClick={handleNextPage}
                                 disabled={page === 3}
                             >

@@ -153,7 +153,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER =  "sheesikram3@gmail.com"
 EMAIL_HOST_PASSWORD = "mbzv lnpy bswu bdzo"
-GROQ_API_KEY = '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'
+GROQ_API_KEY = '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'
 
 from datetime import timedelta
 

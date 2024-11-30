@@ -33,49 +33,49 @@ const UpdateJob = ({ params }) => {
 
     useEffect(() => {
         if (!params.id) {
-          setLoading(false); // Stop loading immediately if ID is missing
-          return;
+            setLoading(false); // Stop loading immediately if ID is missing
+            return;
         }
-    
+
         const fetchJobData = async () => {
-          try {
-            // Fetch recruiter and subscription data
-            const [response2, response1] = await Promise.all([
-              axios.get("http://127.0.0.1:3001/get_recruiter_company", { withCredentials: true }),
-              axios.get("http://127.0.0.1:3001/has-ai-subscription", { withCredentials: true }),
-            ]);
-            setRecruiterData(response2.data);
-            setsubscription(response1.data.ai_subscription);
-    
-            // Fetch job details
-            const response = await axios.get(`http://127.0.0.1:3001/get_job/${params.id}`, { withCredentials: true });
-    
-            // Check if job data exists
-            if (response.data && response.data.job_name) {
-              setFormData({
-                job_name: response.data.job_name || "",
-                job_id: response.data.id || "",
-                job_location: response.data.job_location || "",
-                workplace_type: response.data.workplace_type || "",
-                employment_type: response.data.employment_type || "",
-                description: response.data.description || "",
-                skills: response.data.skills || [],
-                interview_type: response.data.interview_type || "manual",
-                new_company_name: response.data.new_company_name || "",
-              });
-              setError(null); // Clear any previous error
-            } else {
-              setError("No Post Available"); // Set error message if job doesn't exist
+            try {
+                // Fetch recruiter and subscription data
+                const [response2, response1] = await Promise.all([
+                    axios.get("http://127.0.0.1:3001/get_recruiter_company", { withCredentials: true }),
+                    axios.get("http://127.0.0.1:3001/has-ai-subscription", { withCredentials: true }),
+                ]);
+                setRecruiterData(response2.data);
+                setsubscription(response1.data.ai_subscription);
+
+                // Fetch job details
+                const response = await axios.get(`http://127.0.0.1:3001/get_job/${params.id}`, { withCredentials: true });
+
+                // Check if job data exists
+                if (response.data && response.data.job_name) {
+                    setFormData({
+                        job_name: response.data.job_name || "",
+                        job_id: response.data.id || "",
+                        job_location: response.data.job_location || "",
+                        workplace_type: response.data.workplace_type || "",
+                        employment_type: response.data.employment_type || "",
+                        description: response.data.description || "",
+                        skills: response.data.skills || [],
+                        interview_type: response.data.interview_type || "manual",
+                        new_company_name: response.data.new_company_name || "",
+                    });
+                    setError(null); // Clear any previous error
+                } else {
+                    setError("No Post Available"); // Set error message if job doesn't exist
+                }
+            } catch (error) {
+                setError("No Post Available"); // Set error message in case of an error
+            } finally {
+                setLoading(false); // Stop loading in all cases
             }
-          } catch (error) {
-            setError("No Post Available"); // Set error message in case of an error
-          } finally {
-            setLoading(false); // Stop loading in all cases
-          }
         };
-    
+
         fetchJobData();
-      }, [params.id]);
+    }, [params.id]);
 
     const handlePayment = async (event) => {
         event.preventDefault(); // Prevent the page from refreshing
@@ -84,7 +84,7 @@ const UpdateJob = ({ params }) => {
         try {
             const response = await axios.post(
                 'http://127.0.0.1:3001/create_checkout_session/',
-                { interview_type: 'ai',job_id:  params.id.toString() },
+                { interview_type: 'ai', job_id: params.id.toString() },
                 {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
@@ -101,15 +101,15 @@ const UpdateJob = ({ params }) => {
 
                 if (error) {
                     console.error('Error redirecting to checkout:', error);
-                   
+
                 }
             } else {
                 console.error('Checkout session creation failed');
-               
+
             }
         } catch (error) {
             console.error('Error initiating payment:', error);
-           
+
         }
     };
 
@@ -283,11 +283,11 @@ const UpdateJob = ({ params }) => {
 
     const handleDelete = async () => {
         try {
-            const response = await axios.delete(`http://127.0.0.1:3001/deletejob/${formData.job_id}`,{ withCredentials: true });
+            const response = await axios.delete(`http://127.0.0.1:3001/deletejob/${formData.job_id}`, { withCredentials: true });
             router.push("/Users/Posts");
         } catch (error) {
             console.error("Error deleting job post:", error);
-           
+
         }
     };
 
@@ -313,9 +313,9 @@ const UpdateJob = ({ params }) => {
             console.error("Error updating job post:", error);
         }
     };
-    
 
-   
+
+
 
     if (loading) return <>
         <Loader></Loader>
@@ -325,25 +325,25 @@ const UpdateJob = ({ params }) => {
     const skillOptions = ["Front-end", "Back-end", "Full Stack", "App Development", "DB Administrator"];
     const workplaceTypes = ["Remote", "On site", "Hybrid"];
 
-     
-   if (error) {
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="text-center bg-red-100 text-red-600 p-6 rounded-lg shadow-lg max-w-md w-full">
-        <p className="text-xl font-semibold mb-4">No Post Available</p>
-        <p className="text-sm">It looks like the job you're looking for does not exist or could not be fetched. Please try again later.</p>
-      </div>
-    </div>
-  );
-}
 
-  
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="text-center bg-red-100 text-red-600 p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <p className="text-xl font-semibold mb-4">No Post Available</p>
+                    <p className="text-sm">It looks like the job you're looking for does not exist or could not be fetched. Please try again later.</p>
+                </div>
+            </div>
+        );
+    }
 
-   
+
+
+
     return (
         <div className="flex flex-col items-center min-h-screen bg-gray-50 py-10 px-4 lg:px-8" style={{ backgroundColor: "#F4F2EE", paddingTop: "4rem" }}>
             <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-8 sm:p-12 lg:p-16">
-                <h1 className="text-3xl font-bold text-center text-blue-700 mb-8">Update Post</h1>
+                <h1 className="text-3xl font-bold text-center text-[#0073b1] mb-8">Update Post</h1>
                 <form className="space-y-6">
                     {page === 1 && (
                         <>
@@ -382,11 +382,12 @@ const UpdateJob = ({ params }) => {
 
                                         <button
                                             type="button"
-                                            className="absolute right-0 top-1/2 transform -translate-y-1/2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-md focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-30 shadow-lg hover:shadow-xl active:scale-95"
+                                            className="absolute right-0 top-1/2 transform -translate-y-1/2 py-3 px-4 bg-gradient-to-r from-[#0073b1] to-indigo-700 text-white rounded-md focus:outline-none focus:ring-4 focus:ring-[#0073b1] focus:ring-opacity-30 shadow-lg hover:shadow-xl active:scale-95"
                                             onClick={handleGenerateTitle}
                                         >
                                             <SiGooglegemini className="w-6 h-6 text-white" />
                                         </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -587,7 +588,7 @@ const UpdateJob = ({ params }) => {
                             </button>
                             <button
                                 type="button"
-                                className={`px-6 py-2 rounded-lg transition ${page === 3 ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'}`}
+                                className={`px-6 py-2 rounded-lg transition ${page === 3 ? 'bg-gray-200 text-white-700 cursor-not-allowed' : 'bg-[#0073b1] text-white  cursor-pointer'}`}
                                 onClick={handleNextPage}
                                 disabled={page === 3}
                             >
@@ -596,7 +597,7 @@ const UpdateJob = ({ params }) => {
                         </div>
                     )}
 
-{page === 1 && (
+                    {page === 1 && (
                         <div className="mt-8 flex justify-between">
                             <button
                                 type="button"

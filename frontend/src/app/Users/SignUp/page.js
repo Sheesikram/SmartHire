@@ -3,13 +3,13 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import toast, { Toaster } from 'react-hot-toast';
 import "../../globals.css";
-import bgImage from "../../Photos/bg.png";
+import bgImage from "../../Photos/file.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { show_search } from "@/Redux/Action";
+import { show_search,search_bar_action } from "@/Redux/Action";
 const OtpInput = ({ otp, setOtp }) => {
 
     const inputRefs = useRef([]);
@@ -75,6 +75,8 @@ const Signup = () => {
     const router = useRouter();
     const dispatch = useDispatch();
     dispatch(show_search(false));
+    dispatch(search_bar_action(""));
+
     useEffect(() => {
         let countdown;
         if (isOtpSent && timer > 0) {

@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaBuilding, FaMapMarkerAlt, FaSuitcase } from "react-icons/fa";
+import { FaBuilding, FaMapMarkerAlt, FaSuitcase, FaBriefcase } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Loader from "../../others/loader";
 import { useSelector, useDispatch } from "react-redux";
-import { show_search } from "@/Redux/Action";
+import { show_search,search_bar_action } from "@/Redux/Action";
 
 const Posts = () => {
     const dispatch = useDispatch();
@@ -40,8 +40,10 @@ const Posts = () => {
     useEffect(() => {
         sessionStorage.removeItem('formData');
         fetchJobs(currentPage);
+
     }, [currentPage]);
 
+   
     useEffect(() => {
         sessionStorage.removeItem('formData');
         fetchJobs(1);
@@ -58,35 +60,40 @@ const Posts = () => {
     };
 
     if (loading) {
-        return <Loader />;
+        return <>
+        </>;
     }
 
     return (
         <div className="min-h-screen py-16 mt-8" style={{ backgroundColor: "#F4F2EE" }}>
             <div className="w-full max-w-6xl mx-auto px-6">
                 <div className="flex justify-between items-center mb-12">
-                    <h1 className="text-5xl font-bold text-[#0073b1] tracking-tight">Available Jobs</h1>
+                    <div>
+                        <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight leading-tight">
+                            <span className="text-[#0073b1]">Available</span> Jobs
+                        </h1>
+
+                    </div>
                     <button
-                        className="bg-[#0073b1] text-white flex items-center py-3 px-8 rounded-full font-semibold shadow-md hover:scale-105 transition-all"
+                        className="bg-[#0073b1] text-white flex items-center py-3 px-8 rounded-full font-semibold shadow-md hover:scale-105 hover:shadow-lg transition-all"
                         onClick={() => router.push("/Users/Posts/CreateJob")}
                     >
-                        <FaSuitcase className="mr-2 text-lg" />
+                        <FaBriefcase className="mr-2 text-lg" />
                         Post a Job
                     </button>
                 </div>
 
+
                 {jobs.length === 0 ? (
                     <div className="flex flex-col items-center justify-center min-h-[50vh]">
-                        <h2 className="text-3xl font-semibold text-blue-600 mb-3">No Jobs Available</h2>
+                        <h2 className="text-3xl font-semibold text-[#0073b1] mb-3">No Jobs Available</h2>
                         <p className="text-gray-500 text-center">
                             Be the first to post a job and connect with talented candidates.
                         </p>
                     </div>
                 ) : (
                     <div>
-                        <p className="text-sm text-gray-600 mb-6">
-                            Showing page {currentPage} of {totalPages} ({totalJobs} jobs total)
-                        </p>
+
 
                         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                             {jobs.map((job, index) => (
@@ -145,11 +152,10 @@ const Posts = () => {
                             {Array.from({ length: totalPages }, (_, i) => (
                                 <button
                                     key={i}
-                                    className={`px-5 py-2 mx-2 rounded-full transition-colors duration-300 ${
-                                        currentPage === i + 1
+                                    className={`px-5 py-2 mx-2 rounded-full transition-colors duration-300 ${currentPage === i + 1
                                             ? "bg-[#0073b1] text-white"
                                             : "bg-gray-200 text-gray-600 hover:bg-[#0073b1] hover:text-white"
-                                    }`}
+                                        }`}
                                     onClick={() => handlePageChange(i + 1)}
                                 >
                                     {i + 1}

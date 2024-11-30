@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaBuilding, FaMapMarkerAlt, FaSuitcase, FaHeart } from "react-icons/fa";
+import { FaBuilding, FaMapMarkerAlt, FaSuitcase, FaHeart, FaBriefcase } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Loader from "../../others/loader";
 import { useSelector, useDispatch } from "react-redux";
-import { show_search } from "@/Redux/Action";
+import { show_search,search_bar_action } from "@/Redux/Action";
 
 // Utility function for truncating text
 const truncateText = (text, maxLength) => {
@@ -16,7 +16,7 @@ const truncateText = (text, maxLength) => {
 const CandidateJobs = () => {
     const dispatch = useDispatch();
     const router = useRouter();
-
+    dispatch(show_search(true));
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +25,6 @@ const CandidateJobs = () => {
     const searchTerm = useSelector((state) => state.search_bar_reducer);
 
     dispatch(show_search(true));
-
     const fetchJobs = async (page, search = searchTerm) => {
         setLoading(true);
         try {
@@ -46,7 +45,10 @@ const CandidateJobs = () => {
 
     useEffect(() => {
         fetchJobs(currentPage);
+
     }, [currentPage]);
+
+   
 
     useEffect(() => {
         fetchJobs(1);
@@ -74,23 +76,37 @@ const CandidateJobs = () => {
         <div className="min-h-screen py-12 mt-12" style={{ backgroundColor: "#F4F2EE" }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <header className="text-center mb-10">
-                    <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
-                        Discover Your Dream Job
-                    </h1>
-                    <p className="mt-4 text-lg text-gray-600">
-                        Browse top opportunities and apply with confidence.
-                    </p>
-                </header>
+                {jobs.length > 0 && (
+                    <header className="text-center mb-12">
+                        <h1 className="text-5xl font-extrabold tracking-wide text-gray-900 leading-tight">
+                            <span className="bg-gradient-to-r from-[#0073b1] to-[#0073b1] text-transparent bg-clip-text">
+                                Discover Your Dream Job
+                            </span>
+                        </h1>
+                        <p className="mt-6 text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
+                            Unlock top opportunities tailored to your skills and aspirations. Apply with confidence and take the next step in your career journey.
+                        </p>
+                    </header>
+                )}
+
 
                 {/* Content */}
                 {loading ? (
-                    <Loader />
+                    <>
+                    
+                    </>
                 ) : jobs.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center min-h-[50vh]">
-                        <h2 className="text-2xl font-medium text-gray-700">No Jobs Found</h2>
-                        <p className="text-gray-500 mt-2">Try refining your search or check back later.</p>
+                    <div className="flex flex-col items-center justify-center min-h-[50vh] bg-[#F9FAFB] rounded-lg p-8 shadow-md">
+                        <div className="bg-[#0073b1] text-white w-16 h-16 flex items-center justify-center rounded-full mb-6">
+                            <FaBriefcase className="text-white w-6 h-6 " />
+                        </div>
+                        <h2 className="text-3xl font-bold text-[#0073b1] mb-4">No Jobs Found</h2>
+                        <p className="text-lg text-gray-600 text-center max-w-md">
+                            We couldn't find any jobs matching your search. Refine your search criteria or check back later for new opportunities.
+                        </p>
+
                     </div>
+
                 ) : (
                     <>
                         {/* Jobs List */}
@@ -168,8 +184,8 @@ const CandidateJobs = () => {
                                         key={index}
                                         onClick={() => handlePageChange(index + 1)}
                                         className={`px-4 py-2 text-sm font-medium rounded-md mx-1 ${currentPage === index + 1
-                                                ? "bg-[#0073b1] text-white"
-                                                : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                                            ? "bg-[#0073b1] text-white"
+                                            : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
                                             }`}
                                     >
                                         {index + 1}

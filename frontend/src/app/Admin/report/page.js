@@ -133,11 +133,11 @@ const ReportedJobs = () => {
                             <tr key={job.id} className="border-b border-gray-200 hover:bg-blue-50 transition duration-300 transform hover:scale-102">
                                 <td className="px-6 py-4 text-base text-black-600">{job.id}</td>
                                 <td className="px-6 py-4 text-base text-black-600 max-w-[40ch] truncate">{job.job_name}</td>
-                                <td className="px-6 py-4 text-base text-black-600 max-w-[20ch] truncate">{job.job_id}</td>
+                                <td className="px-6 py-4 text-base text-black-600 max-w-[20ch] truncate">{job.job_location}</td>
                                 <td className="px-6 py-4 text-base text-black-600">{job.skills}</td>
                                 <td className="px-6 py-4 text-base text-center">
                                     <button
-                                        onClick={() => openModal(job, job.job_id)}
+                                        onClick={() => openModal(job, job.id)}
                                         className="px-6 py-3 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 transform hover:scale-105"
                                     >
                                         Delete

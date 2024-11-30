@@ -5,14 +5,16 @@ import axios from "axios";
 import Loader from "@/app/others/loader";
 import { FaBuilding, FaMapMarkerAlt, FaClipboardList, FaClock, FaArrowLeft, FaCheckCircle, FaFlag } from "react-icons/fa";
 import { MdOutlineWork } from "react-icons/md";
-
+import { useDispatch, useSelector } from 'react-redux';
+import { show_search } from "@/Redux/Action";
 const Job = ({ params }) => {
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false); // State for the modal visibility
     const [jobToReport, setJobToReport] = useState(null); // Store the job ID to report
-
+    const dispatch = useDispatch();
+    dispatch(show_search(false));
     // Fetch job details
     useEffect(() => {
         const fetchJobDetails = async () => {

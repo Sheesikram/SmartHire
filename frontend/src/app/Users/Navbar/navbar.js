@@ -19,7 +19,7 @@ import { Role_Action } from "@/Redux/Action";
 
 import { ProfileLink } from "./profile";
 import { SearchBar } from "./search";
-import bgImage from "../../Photos/bg.png";
+import bgImage from "../../Photos/file.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +51,7 @@ const Navbar = () => {
             <img
               src={bgImage.src}
               alt="Logo"
-              className="h-8 w-8 rounded-full"
+              className="h-12 w-12 rounded-full"
             />
             <SearchBar />
           </div>
