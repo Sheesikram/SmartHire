@@ -5,7 +5,7 @@ import { faBriefcase, faRobot, faChartLine, faUserGraduate } from "@fortawesome/
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import smarthire from "../../Photos/smarthire1.mp4"; // Import video
 import { useDispatch, useSelector } from 'react-redux';
-import { show_search,search_bar_action } from "@/Redux/Action";
+import { show_search, search_bar_action } from "@/Redux/Action";
 export default function Home() {
   const router = useRouter();
   const role = useSelector((state) => state.Role_Reducer);
@@ -113,22 +113,26 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
             <TestimonialCard
               name="John Doe"
-              position="Recruiter at TechCorp"
+              position="Recruiter at Pluginfy Technologies"
               text="SmartHire has streamlined our hiring process and improved candidate quality."
+              avatar="https://randomuser.me/api/portraits/men/32.jpg"
             />
             <TestimonialCard
               name="Jane Smith"
               position="HR Manager at InnovateX"
               text="The AI interview feature is a game-changer for finding top talent quickly."
+              avatar="https://randomuser.me/api/portraits/women/44.jpg"
             />
             <TestimonialCard
               name="Carlos Martinez"
               position="Recruiter at GlobalHire"
               text="I love the analytics! It gives us insights we never had before."
+              avatar="https://randomuser.me/api/portraits/men/65.jpg"
             />
           </div>
         </div>
       </section>
+
 
       {/* How It Works Section */}
       <section className="py-20 bg-white border-t border-gray-200">
@@ -212,15 +216,27 @@ function FeatureCard({ icon, title, description }) {
 }
 
 // Reusable Testimonial Card Component
-function TestimonialCard({ name, position, text }) {
+function TestimonialCard({ name, position, text, avatar }) {
   return (
     <div className="p-8 bg-white rounded-lg shadow-lg text-left border border-gray-200 hover:shadow-2xl hover:scale-105 transition-all ease-in-out duration-300">
-      <p className="text-gray-600 mb-4">"{text}"</p>
-      <h4 className="font-semibold">{name}</h4>
-      <p className="text-gray-500 text-sm">{position}</p>
+      {/* Avatar */}
+      <div className="flex items-center mb-4">
+        <img
+          src={avatar}
+          alt={`${name}'s avatar`}
+          className="w-12 h-12 rounded-full mr-4"
+        />
+        <div>
+          <h4 className="font-semibold">{name}</h4>
+          <p className="text-gray-500 text-sm">{position}</p>
+        </div>
+      </div>
+      {/* Testimonial Text */}
+      <p className="text-gray-600">"{text}"</p>
     </div>
   );
 }
+
 
 // Reusable Step Card Component
 function StepCard({ step, title, description }) {
