@@ -31,7 +31,7 @@ from checkout.views import create_checkout_session,verify_payment
 from Up_del_ret_job.views import get_job_by_id,update_job,delete_job,get_job_id
 from Dashboard.views import get_dashboard_stats
 from Dashboard.views import load_users,delete_user,subscribers,delete_subscription,delete_job,load_jobs,load_reported_jobs,delete_job_and_reports,delete_report
-from report.views import create_report
+from report.views import create_report,check_report_status
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -73,5 +73,7 @@ urlpatterns = [
     path('load_reports/', load_reported_jobs, name='load_reports'),
     path('delete_job_report/<int:job_id>/', delete_job_and_reports, name='delete_job_and_reports'),
     path('delete_report/<int:report_id>/', delete_report, name='delete_report'),
+    path('check_report_status/<int:job_id>/', check_report_status, name='check_report_status'),
+
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

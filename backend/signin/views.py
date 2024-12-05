@@ -11,30 +11,54 @@ from django.core.cache import cache
 import jwt
 import datetime
 
-# Send OTP for sign-in with a 60-second expiration
 @api_view(['POST'])
 def send_otp_signin(request):
+    """
+    API to send an OTP for signing in via email.
+    """
     email = request.data.get('email')
+    if not email:
+        return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
+        # Verify if the email exists in the database
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         return Response({'error': 'Email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Generate a random 6-digit OTP
     otp = random.randint(100000, 999999)
-    
-    # Set OTP in cache with a 60-second expiration
-    cache.set(f'otp_{email}', otp, timeout=60)
 
-    # Send OTP via email
-    send_mail(
-        'Your OTP for Password Reset',
-        f'Your OTP is: {otp}. This OTP will expire in 60 seconds.',
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=False,
-    )
+    # Store the OTP in the cache with a 60-second expiration
+    cache_key = f'otp_{email}'
+    cache.set(cache_key, otp, timeout=60)
 
-    return Response({'success': 'OTP sent to your email!'}, status=status.HTTP_200_OK)
+    # Prepare the email content
+    subject = "Your SmartHire OTP"
+    message = f"""
+Hello {user.email or 'User'},
+
+Use this OTP to verify your account:
+
+**{otp}**
+
+This OTP will expire in 60 seconds. If you didn’t request this, please ignore this email.
+
+Best regards,  
+The SmartHire Team
+    """
+    try:
+        # Send the OTP email
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )
+        return Response({'success': 'OTP sent to your email!'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': 'Failed to send OTP email', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Verify the OTP and check for expiration
 @api_view(['POST'])

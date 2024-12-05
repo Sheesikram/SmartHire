@@ -5,22 +5,30 @@ import axios from "axios";
 import Loader from "@/app/others/loader";
 import { FaBuilding, FaMapMarkerAlt, FaClipboardList, FaClock, FaArrowLeft, FaCheckCircle, FaFlag } from "react-icons/fa";
 import { MdOutlineWork } from "react-icons/md";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { show_search } from "@/Redux/Action";
+
 const Job = ({ params }) => {
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false); // State for the modal visibility
-    const [jobToReport, setJobToReport] = useState(null); // Store the job ID to report
+    const [showModal, setShowModal] = useState(false);
+    const [jobToReport, setJobToReport] = useState(null);
+    const [feedback, setFeedback] = useState(""); // Feedback input
+    const [feedbackError, setFeedbackError] = useState(null); // Feedback validation error
+    const [report, setreport] = useState("No");
+
     const dispatch = useDispatch();
     dispatch(show_search(false));
-    // Fetch job details
+
     useEffect(() => {
         const fetchJobDetails = async () => {
             try {
                 const response = await axios.get(`http://127.0.0.1:3001/get_jobs/${params.id}`, { withCredentials: true });
                 setJob(response.data);
+                const response1 = await axios.get(`http://127.0.0.1:3001/check_report_status/${params.id}`, { withCredentials: true });
+                setreport(response1.data.message);
+
             } catch (err) {
                 setError(err.response?.data?.error || "Failed to fetch job details.");
             } finally {
@@ -32,9 +40,20 @@ const Job = ({ params }) => {
     }, [params.id]);
 
     const reportJob = async (jobId) => {
+        if (!feedback.trim()) {
+            setFeedbackError("Feedback is required.");
+            return;
+        }
+
         try {
-            const response = await axios.post('http://127.0.0.1:3001/report/', { job_id: jobId }, { withCredentials: true });
+            await axios.post(
+                'http://127.0.0.1:3001/report/',
+                { job_id: jobId, feedback },
+                { withCredentials: true }
+            );
             setShowModal(false); // Close modal after reporting
+            setFeedback(""); // Clear feedback input
+            setreport("Yes")
         } catch (err) {
             console.error("Error reporting job:", err);
         }
@@ -42,11 +61,15 @@ const Job = ({ params }) => {
 
     const handleReportClick = (jobId) => {
         setJobToReport(jobId);
-        setShowModal(true); // Show the modal when report button is clicked
+        setShowModal(true);
+        setFeedback("");
+        setFeedbackError(null);
     };
 
     const handleCancel = () => {
-        setShowModal(false); // Close the modal if user cancels
+        setShowModal(false);
+        setFeedback("");
+        setFeedbackError(null);
     };
 
     if (loading) {
@@ -142,8 +165,14 @@ const Job = ({ params }) => {
                             Apply <FaCheckCircle className="ml-2 inline-block" />
                         </button>
                         <button
-                            onClick={() => handleReportClick(job.id)}  // Show modal for reporting the job
-                            className="w-full sm:w-auto px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md transition-colors duration-300 hover:bg-red-600"
+                            onClick={() => handleReportClick(job.id)}
+                            disabled={report === "Yes"} // Disable the button if report status is "Yes"
+                            className={`w-full sm:w-auto px-6 py-3 text-white font-semibold rounded-lg shadow-md transition-colors duration-300 
+                ${report === "Yes"
+                                    ? "bg-gray-400 cursor-not-allowed" // Disabled state
+                                    : "bg-red-500 hover:bg-red-600"} // Enabled state
+            `}
+                            title={report === "Yes" ? "You have already reported this job" : "Report this job"}
                         >
                             Report <FaFlag className="ml-2 inline-block" />
                         </button>
@@ -151,11 +180,21 @@ const Job = ({ params }) => {
                 </div>
             </div>
 
-            {/* Confirmation Modal */}
+            {/* Report Modal */}
             {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50 px-4">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-                        <h2 className="text-xl font-bold mb-4">Are you sure you want to report this job?</h2>
+                        <h2 className="text-xl font-bold mb-4">Report Job</h2>
+                        <textarea
+                            className={`w-full border ${feedbackError ? "border-red-500" : "border-gray-300"} rounded-lg p-2 mb-4`}
+                            placeholder="Write one line feedback..."
+                            value={feedback}
+                            onChange={(e) => {
+                                setFeedback(e.target.value);
+                                setFeedbackError(null);
+                            }}
+                        />
+                        {feedbackError && <p className="text-red-500 text-sm mb-2">{feedbackError}</p>}
                         <div className="flex justify-between">
                             <button
                                 onClick={handleCancel}
@@ -164,10 +203,10 @@ const Job = ({ params }) => {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => reportJob(jobToReport)}  // Report the job
+                                onClick={() => reportJob(jobToReport)}
                                 className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg"
                             >
-                                Yes, Report
+                                Submit
                             </button>
                         </div>
                     </div>

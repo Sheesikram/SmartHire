@@ -130,6 +130,7 @@ const Dashboard = () => {
                                     <sub.Icon className="w-12 h-12 text-black" />
                                 )}
                             </div>
+                            {/* <p>{sub.type}</p> */}
                             <p className="text-3xl font-semibold">
                                 <CountUp
                                     start={0}
@@ -139,6 +140,7 @@ const Dashboard = () => {
                                     suffix={sub.count > 999 ? "+" : ""}
                                 />
                             </p>
+                            
                         </div>
                     ))}
                 </div>

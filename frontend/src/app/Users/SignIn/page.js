@@ -120,7 +120,7 @@ const SignIn = () => {
         } else {
             setEmailError("");
         }
-
+        setCaptchaValue(null);
         setLoading(true);
         try {
             await axios.post("http://127.0.0.1:3001/send-otp_signin/", { email });
@@ -135,6 +135,7 @@ const SignIn = () => {
 
     const handleResendOtp = async () => {
         setLoading(true);
+        setCaptchaValue(null);
         try {
             await axios.post("http://127.0.0.1:3001/send-otp_signin/", { email });
             setTimer(60); // Restart countdown
@@ -154,7 +155,7 @@ const SignIn = () => {
 
     const handleVerifyOtp = async (e) => {
         e.preventDefault();
-
+        setCaptchaValue(null);
         if (otp.includes("")) {
             setOtpError("Please enter the complete OTP.");
             return;

@@ -125,7 +125,8 @@ const Profile = () => {
     e.preventDefault();
 
     const newErrors = {};
-    ["firstName", "lastName"].forEach(field => {
+    ["firstName", "lastName", "contactNo", "country", "linkedIn", ...(role === "Candidate" ? ["skills", "education"] : []), ...(role === "Recruiter" ? ["companyName", "website"] : [])]
+    .forEach((field) => {
       const fieldErrors = validateField(field, formData[field]);
       if (Object.keys(fieldErrors).length > 0) {
         newErrors[field] = fieldErrors[field];

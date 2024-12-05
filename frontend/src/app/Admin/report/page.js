@@ -21,42 +21,36 @@ const ReportedJobs = () => {
     const dispatch = useDispatch();
     const [jobToDelete, setJobToDelete] = useState(null);
     const [reportId, setReportId] = useState(null);
-    // Debounce logic
+
     const fetchReportedJobs = async (pageNumber = 1, search = searchQuery) => {
         try {
-            setLoading(true); // Start loading
-            setError(null); // Reset any previous errors
+            setLoading(true);
+            setError(null);
     
             const response = await axios.get(
                 `http://127.0.0.1:3001/load_reports/?page=${pageNumber}&title=${search}`,
                 { withCredentials: true }
             );
     
-            // Handle both backend response structures
             const reportedJobs = Array.isArray(response.data?.results?.reported_jobs)
-                ? response.data.results.reported_jobs // When jobs are nested in "results"
+                ? response.data.results.reported_jobs
                 : Array.isArray(response.data?.reported_jobs)
-                ? response.data.reported_jobs // When jobs are directly in the response
-                : []; // Default to an empty array if neither is present
+                ? response.data.reported_jobs
+                : [];
     
-            const total_count = response.data?.count || 0; // Default to 0 if not provided
-            const total_pages = Math.ceil(total_count / 10); // Calculate total pages
+            const total_count = response.data?.count || 0;
+            const total_pages = Math.ceil(total_count / 10);
     
-            // Update state with response data
             setReportedJobs(reportedJobs);
             setTotalPages(total_pages);
             setTotalCount(total_count);
         } catch (err) {
             setError("Failed to fetch reported jobs: " + err.message);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
-    
-    
-    
 
-    
     useEffect(() => {
         fetchReportedJobs(page, searchQuery);
     }, [page]);
@@ -101,7 +95,7 @@ const ReportedJobs = () => {
 
     const openModal = (job, reportId) => {
         setJobToDelete(job);
-        setReportId(reportId); // Set the report ID for ignoring reports
+        setReportId(reportId);
         setShowModal(true);
     };
 
@@ -113,10 +107,8 @@ const ReportedJobs = () => {
 
     return (
         <div className="pt-8 pe-4 pl-4 md:p-12 rounded-3xl mx-auto mt-12" style={{ backgroundColor: "#F4F2EE" }}>
-            {/* Search Bar */}
             <SearchBar></SearchBar>
 
-            {/* Reported Jobs Table */}
             <div className="overflow-x-auto shadow-lg sm:rounded-2xl bg-white">
                 <table className="w-full table-auto mb-10 border-collapse">
                     <thead className="bg-gradient-to-r from-blue-200 via-blue-300 to-blue-400 text-black">
@@ -149,7 +141,6 @@ const ReportedJobs = () => {
                 </table>
             </div>
 
-            {/* Pagination */}
             <div className="flex justify-center items-center space-x-8 mb-12 mt-12">
                 <button
                     disabled={page <= 1}
@@ -167,67 +158,62 @@ const ReportedJobs = () => {
                 </button>
             </div>
 
-            {/* Modal for Confirm Deletion */}
             {showModal && (
                 <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 transition-opacity duration-200">
-                    {/* Modal Content Wrapper */}
                     <div className="w-full max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8 border border-gray-200 max-h-[90vh] flex flex-col">
-
-                        {/* Modal Header */}
                         <h1 className="text-4xl font-extrabold text-[#0073b1] mb-6">{jobToDelete.job_name}</h1>
 
-                        {/* Modal Content Section */}
                         <div className="flex-1 overflow-y-auto mb-8">
-                            {/* Job Details Section */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                                 <div className="flex items-center space-x-4 text-gray-700">
                                     <FaBuilding className="text-[#0073b1] h-6 w-6" />
-                                    <p className="font-medium break-words max-w-full">
-                                        Company: <span className="text-gray-800 ">{jobToDelete.company_name}</span>
-                                    </p>
+                                    <p className="font-medium break-words max-w-full">{jobToDelete.company_name}</p>
                                 </div>
                                 <div className="flex items-center space-x-4 text-gray-700">
-                                    <FaMapMarkerAlt className="text-red-500 h-6 w-6 flex-shrink-0" />
-                                    <p className="font-medium break-words max-w-full overflow-x-auto">
-                                        Location: <span className="text-gray-800">{jobToDelete.job_location}</span>
-                                    </p>
+                                    <FaMapMarkerAlt className="text-red-500 h-6 w-6" />
+                                    <p className="font-medium break-words max-w-full">{jobToDelete.job_location}</p>
                                 </div>
-
                                 <div className="flex items-center space-x-4 text-gray-700">
                                     <MdOutlineWork className="text-green-600 h-6 w-6" />
-                                    <p className="font-medium break-words max-w-full">
-                                        Workplace Type: <span className="text-gray-800">{jobToDelete.workplace_type}</span>
-                                    </p>
+                                    <p className="font-medium break-words max-w-full">{jobToDelete.workplace_type}</p>
                                 </div>
                                 <div className="flex items-center space-x-4 text-gray-700">
                                     <FaClipboardList className="text-yellow-600 h-6 w-6" />
-                                    <p className="font-medium break-words max-w-full">
-                                        Employment Type: <span className="text-gray-800">{jobToDelete.employment_type}</span>
-                                    </p>
+                                    <p className="font-medium break-words max-w-full">{jobToDelete.employment_type}</p>
                                 </div>
                             </div>
 
-                            {/* Job Description */}
                             <div className="border-t border-gray-200 pt-6 mb-6">
                                 <h2 className="text-2xl font-bold text-gray-700 mb-4">Job Description</h2>
                                 <p className="text-gray-700 leading-relaxed break-words overflow-x-auto">{jobToDelete.description}</p>
                             </div>
 
-
-                            {/* Required Skills */}
                             <div className="border-t border-gray-200 pt-6 mb-6">
                                 <h2 className="text-2xl font-bold text-gray-700 mb-4">Required Skills</h2>
                                 <ul className="list-disc pl-5 text-gray-700">
                                     {jobToDelete.skills.split(",").map((skill, index) => (
-                                        <li key={index} className="py-1 font-medium">
-                                            {skill.trim()}
-                                        </li>
+                                        <li key={index} className="py-1 font-medium">{skill.trim()}</li>
                                     ))}
                                 </ul>
                             </div>
+
+                            {/* User Feedback Section */}
+                            <div className="border-t border-gray-200 pt-6 mb-6">
+                                <h2 className="text-2xl font-bold text-gray-700 mb-4">User Feedback</h2>
+                                <div className="space-y-4">
+                                    {jobToDelete.feedback && jobToDelete.feedback.length > 0 ? (
+                                        jobToDelete.feedback.map((feedback, index) => (
+                                            <div key={index} className="text-gray-700 p-4 border rounded-md shadow-sm">
+                                                <p className="break-words">{feedback}</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500">No feedback available for this job.</p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Modal Action Buttons */}
                         <div className="mt-auto flex justify-end space-x-4 mb-6">
                             <button
                                 onClick={ignoreReport}
@@ -246,7 +232,6 @@ const ReportedJobs = () => {
                     </div>
                 </div>
             )}
-
         </div>
     );
 };

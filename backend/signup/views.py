@@ -14,28 +14,58 @@ def generate_otp(length=6):
     """Generate a random OTP of given length."""
     return ''.join(random.choices(string.digits, k=length))
 
+
+
 @api_view(['POST'])
 def send_otp(request):
+    """
+    API to send an OTP to a user's email for verification.
+    """
     email = request.data.get('email')
-    
+    if not email:
+        return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if a user with this email already exists
     if User.objects.filter(email=email).exists():
         return Response({'message': 'User with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Generate the OTP and store it with a timestamp
     otp = generate_otp()
     otp_storage[email] = {
         'otp': otp,
-        'timestamp': time.time()  # Store the current time when OTP is generated
+        'timestamp': time.time()
     }
 
-    send_mail(
-        'Your OTP Code',
-        f'Your OTP code is {otp}. It is valid for 60 seconds.',
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=False,
-    )
+    # Fetch user's first name if available (if registering, you may not have this yet)
+    user_first_name = request.data.get('first_name', 'User')
 
-    return Response({'message': 'OTP sent to your email.'})
+    # Construct the email message
+    subject = "Your SmartHire OTP"
+    message = f"""
+Hello {email},
+
+Use this OTP to verify your account:
+
+**{otp}**
+
+It expires in 60 seconds. If you didn’t request this, please ignore this email.
+
+Best,  
+SmartHire Team
+    """
+    try:
+        # Send the email
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )
+        return Response({'message': 'OTP sent to your email.'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': 'Failed to send OTP email', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 def verify_otp(request):

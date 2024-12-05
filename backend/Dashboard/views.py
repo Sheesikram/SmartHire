@@ -330,21 +330,26 @@ def load_reported_jobs(request):
     try:
         job_id = request.query_params.get('job_id')  # Optional parameter to fetch a specific job
         title = request.query_params.get('title')  # Optional filter by job_name (from the Job model)
-        
+
         # Base query: Fetch all reported jobs
         reported_jobs = Report.objects.all()
 
         # Filter by job title if provided
         if title:
-            # Ensure title is not None and filter using icontains for partial case-insensitive match
             reported_jobs = reported_jobs.filter(job__job_name__icontains=title.strip())
 
         # Filter by job ID if provided
         if job_id:
             reported_jobs = reported_jobs.filter(job_id=job_id)
 
-        # Total count of filtered jobs
-        total_count = reported_jobs.count()
+        # Deduplicate jobs based on job_id
+        distinct_jobs = reported_jobs.values('job_id').distinct()
+
+        # Retrieve only unique jobs
+        unique_reported_jobs = Job.objects.filter(id__in=[job['job_id'] for job in distinct_jobs])
+
+        # Total count of unique jobs
+        total_count = unique_reported_jobs.count()
 
         # If no jobs are found, prepare an empty response
         if total_count == 0:
@@ -355,23 +360,25 @@ def load_reported_jobs(request):
 
         # Paginate results
         paginator = JobPagination()
-        result_page = paginator.paginate_queryset(reported_jobs, request)
+        result_page = paginator.paginate_queryset(unique_reported_jobs, request)
 
         # Prepare response data
-        reported_jobs_data = [
-            {
-                'id': reported_job.id,
-                'job_id': reported_job.job.id,
-                'job_name': reported_job.job.job_name,  # Getting job_name from Job model
-                'job_location': reported_job.job.job_location,  # Getting job_location from Job model
-                'workplace_type': reported_job.job.workplace_type,  # Getting workplace_type from Job model
-                'employment_type': reported_job.job.employment_type,  # Getting employment_type from Job model
-                'skills': reported_job.job.skills,
-                'description': reported_job.job.description,
-                'company_name': reported_job.job.recruiter.company_name
-            }
-            for reported_job in result_page
-        ]
+        reported_jobs_data = []
+        for job in result_page:
+            # Collect all feedback for the current job
+            feedback_list = Report.objects.filter(job=job).values_list('feedback', flat=True)
+            reported_jobs_data.append({
+                'id': job.id,
+                'job_id': job.id,
+                'job_name': job.job_name,
+                'job_location': job.job_location,
+                'workplace_type': job.workplace_type,
+                'employment_type': job.employment_type,
+                'skills': job.skills,
+                'description': job.description,
+                'company_name': job.recruiter.company_name,
+                'feedback': list(feedback_list)  # Merged feedback as an array
+            })
 
         # Return paginated response with total count
         return paginator.get_paginated_response({
@@ -381,7 +388,6 @@ def load_reported_jobs(request):
 
     except Exception as e:
         return Response({'error': 'Error loading reported jobs', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['DELETE'])
 @authentication_classes([CustomJWTAuthentication])
@@ -396,16 +402,17 @@ def delete_job_and_reports(request, job_id):
         if not job:
             return Response({'error': 'Job not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        # Delete the job (this will also delete related reports if foreign key is set with cascade)
+        # Cascade delete related reports based on the job ID
+        reports = Report.objects.filter(job_id=job_id)
+        reports.delete()
+
+        # Delete the job
         job.delete()
 
         return Response({'message': 'Job and related reports deleted successfully'}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return Response({'error': 'Error deleting job', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
+        return Response({'error': 'Error deleting job and related reports', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 @api_view(['DELETE'])
 @authentication_classes([CustomJWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -415,7 +422,7 @@ def delete_report(request, report_id):
     """
     try:
         # Fetch the report by ID
-        report = Report.objects.filter(id=report_id).first()
+        report = Report.objects.filter(job_id=report_id)
         if not report:
             return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
         
