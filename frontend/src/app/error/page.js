@@ -16,7 +16,7 @@ const ErrorPage = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#F4F2EE] text-center px-4">
             <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-xl border border-gray-300 transform transition-transform duration-300 hover:scale-105">
                 <FaExclamationTriangle className="text-6xl text-yellow-600 mb-4 mx-auto" />
                 <h1 className="text-4xl font-bold text-gray-800 mb-4">Oops! Something went wrong.</h1>
