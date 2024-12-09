@@ -15,9 +15,9 @@ from django.db.models import Q
 logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
-@authentication_classes([CustomJWTAuthentication])
-@permission_classes([IsAuthenticated])
-def get_dashboard_stats(request):
+@authentication_classes([CustomJWTAuthentication])#frontend request only takes by a user whos has a cookies
+@permission_classes([IsAuthenticated])#the user is authenticated or not
+def get_dashboard_stats(request):#this function is used to get the data from the database and show it on the dashboard
     try:
         # Count users with the role 'user'
         user_count = User.objects.filter(role='user').count()

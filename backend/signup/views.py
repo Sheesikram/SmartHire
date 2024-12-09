@@ -1,7 +1,7 @@
 import random
 import string
 import time
-from django.core.mail import send_mail
+from django.core.mail import send_mail  #smtp ke through email send 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -44,14 +44,17 @@ def send_otp(request):
     message = f"""
 Hello {email},
 
-Use this OTP to verify your account:
+Thank you for signing up with SmartHire. To complete your account setup, please use the One-Time Password (OTP) below to verify your account:
 
-**{otp}**
+Verification Code:
+{otp}
 
-It expires in 60 seconds. If you didn’t request this, please ignore this email.
+This code is valid for the next 60 seconds. If you did not request this, please disregard this email.
 
-Best,  
-SmartHire Team
+If you have any questions, feel free to reach out to our support team.
+
+Best regards,
+The SmartHire Team
     """
     try:
         # Send the email
