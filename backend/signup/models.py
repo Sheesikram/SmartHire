@@ -95,13 +95,18 @@ class Subscription(models.Model):
         ('practice', 'Practice'),
         ('both', 'Both'),
     ]
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    # Allow users to have multiple subscriptions of different types
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
     type = models.CharField(max_length=10, choices=SUBSCRIPTION_TYPE_CHOICES, null=True, blank=True)
 
+    class Meta:
+        unique_together = ('user', 'type')  # Ensure a user can only have one subscription of each type
+
     def __str__(self):
-        return f"Subscription for {self.user.email}"
+        return f"Subscription for {self.user.email} ({self.get_type_display()})"
 
 
 

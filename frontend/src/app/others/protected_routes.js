@@ -43,8 +43,8 @@ const Protect = ({ children }) => {
 
         if (
             router=="/Users/Home"   || router=="/Users/Jobs"  ||
-            router=="/Users/Notifications"  || router=="/Users/Profile"  ||  router=="/Users/Practice"  || 
-            router==="/error" ||  router.startsWith("/Users/Jobs/")
+            router=="/Users/Notifications"  || router=="/Users/Profile"  || 
+            router==="/error" ||  router.startsWith("/Users/Jobs/") || router.startsWith("/Users/Practice")
         ) {
             return <>{children}</>;
         } else {

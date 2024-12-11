@@ -27,7 +27,7 @@ from JobList.views import get_jobs_for_recruiter,get_all_jobs
 from createjob.views import get_recruiter_company,create_job
 from AI_job_title.views import enhance_job_title
 from Check_Ai_subs.views import has_ai_subscription,has_prac_subscription
-from checkout.views import create_checkout_session,verify_payment
+from checkout.views import create_checkout_session,verify_payment,create_checkout_session_prac,verify_payment_prac
 from Up_del_ret_job.views import get_job_by_id,update_job,delete_job,get_job_id
 from Dashboard.views import get_dashboard_stats
 from Dashboard.views import load_users,delete_user,subscribers,delete_subscription,delete_job,load_jobs,load_reported_jobs,delete_job_and_reports,delete_report
@@ -57,6 +57,8 @@ urlpatterns = [
     path('has-prac-subscription/', has_prac_subscription, name='has_prac_subscription'),
     path('create_checkout_session/', create_checkout_session, name='create_checkout_session'),
     path('verify_payment/', verify_payment, name='verify_payment'),
+    path('create_checkout_session_prac/', create_checkout_session_prac, name='create_checkout_session'),
+    path('verify_payment_prac/', verify_payment_prac, name='verify_payment'),
     path('get_job/<int:job_id>/', get_job_by_id, name='get_job_by_id'),
     path('updatejob/<int:job_id>/', update_job, name='update_job'),
     path('deletejob/<int:job_id>/', delete_job, name='delete_job'),
