@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "@/app/others/loader";
-import { FaBuilding, FaMapMarkerAlt, FaClipboardList, FaClock, FaArrowLeft, FaCheckCircle, FaFlag } from "react-icons/fa";
+import { FaRobot, FaUserTie, FaExclamationCircle, FaBuilding, FaMapMarkerAlt, FaClipboardList, FaClock, FaArrowLeft, FaCheckCircle, FaFlag } from "react-icons/fa";
 import { MdOutlineWork } from "react-icons/md";
 import { useDispatch } from 'react-redux';
 import { show_search } from "@/Redux/Action";
@@ -127,7 +127,32 @@ const Job = ({ params }) => {
                             Last Updated: <span className="text-gray-800">{new Date(job.updated_at).toLocaleDateString()}</span>
                         </p>
                     </div>
+                    <div className="flex items-center space-x-4 text-gray-700">
+                        {job.interview_type.toLowerCase() === "ai" ? (
+                            <>
+                                <FaRobot className="text-[#0073b1] h-6 w-6" />
+                                <p className="font-medium break-words max-w-full">
+                                    <span className="text-gray-800">AI Interview</span>
+                                </p>
+                            </>
+                        ) : job.interview_type.toLowerCase() === "manual" ? (
+                            <>
+                                <FaUserTie className="text-[#0073b1] h-6 w-6" />
+                                <p className="font-medium break-words max-w-full">
+                                    <span className="text-gray-800">Manual Interview</span>
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <FaExclamationCircle className="text-[#0073b1] h-6 w-6" />
+                                <p className="font-medium break-words max-w-full">
+                                    <span className="text-gray-800">Unknown Interview Type</span>
+                                </p>
+                            </>
+                        )}
+                    </div>
                 </div>
+
 
 
                 {/* Job Description */}
@@ -135,6 +160,8 @@ const Job = ({ params }) => {
                     <h2 className="text-2xl font-bold text-gray-700 mb-4">Job Description</h2>
                     <p className="text-gray-700 leading-relaxed break-words">{job.description}</p>
                 </div>
+
+
 
                 {/* Required Skills */}
                 <div className="border-t border-gray-200 pt-6">

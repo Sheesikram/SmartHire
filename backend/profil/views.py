@@ -82,17 +82,7 @@ def get_profile(request):
                 recruiter_data = None
             user_data['recruiter'] = recruiter_data
 
-            # Retrieve subscription data
-            try:
-                subscription = Subscription.objects.get(user=user)
-                subscription_data = {
-                    'start_date': subscription.start_date,
-                    'end_date': subscription.end_date,
-                    'type': subscription.type,
-                }
-            except Subscription.DoesNotExist:
-                subscription_data = None
-            user_data['subscription'] = subscription_data
+            
 
             return Response(user_data, status=status.HTTP_200_OK)
 
